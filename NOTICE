@@ -1,0 +1,23 @@
+God's Eye
+Copyright 2026 God's Eye contributors
+
+Original source code and rules are licensed under Apache License 2.0.
+Generated Protobuf bindings are generated from this project's schema.
+
+Runtime dependency:
+  google.golang.org/protobuf v1.36.10
+  Copyright The Go Authors
+  BSD-3-Clause
+  https://github.com/protocolbuffers/protobuf-go/blob/v1.36.10/LICENSE
+
+Go toolchain and standard library:
+  Copyright The Go Authors
+  BSD-3-Clause
+  https://go.dev/LICENSE
+
+Build-time contract compiler:
+  grpcio-tools 1.84.0, Apache-2.0
+  https://github.com/grpc/grpc/blob/master/LICENSE
+
+No commercial scanner, SaaS account, or restricted Semgrep registry rule
+bundle is included. See docs/open-source.md for distribution requirements.
