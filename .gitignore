@@ -1,0 +1,4 @@
+/bin/
+/reports/
+*.test
+coverage.out
