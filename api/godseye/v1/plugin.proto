@@ -1,0 +1,324 @@
+syntax = "proto3";
+
+package godseye.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "godseye/gen/go/godseye/v1;godseyev1";
+
+// Required fields and cross-field validation are specified in plugin-protocol.md.
+// UNSPECIFIED values are invalid in accepted persisted objects.
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  SEVERITY_INFO = 1;
+  SEVERITY_LOW = 2;
+  SEVERITY_MEDIUM = 3;
+  SEVERITY_HIGH = 4;
+  SEVERITY_CRITICAL = 5;
+}
+
+enum Category {
+  CATEGORY_UNSPECIFIED = 0;
+  CATEGORY_SAST = 1;
+  CATEGORY_SECRET = 2;
+  CATEGORY_DEPENDENCY = 3;
+  CATEGORY_IAC = 4;
+  CATEGORY_RUNTIME = 5;
+}
+
+enum Reachability {
+  REACHABILITY_UNSPECIFIED = 0;
+  REACHABILITY_UNKNOWN = 1;
+  REACHABILITY_REACHABLE = 2;
+  REACHABILITY_UNREACHABLE = 3;
+}
+
+message Producer {
+  string plugin_id = 1;
+  string plugin_version = 2;
+  string engine_name = 3;
+  string engine_version = 4;
+  string ruleset_digest = 5;
+}
+
+message SourceLocation {
+  // Percent-encoded workspace-relative URI, without scheme or traversal.
+  string artifact_uri = 1;
+  optional uint32 start_line = 2;
+  optional uint32 start_column = 3;
+  optional uint32 end_line = 4;
+  optional uint32 end_column = 5;
+  optional string symbol = 6;
+}
+
+message PackageRef {
+  string purl = 1;
+  string ecosystem = 2;
+  string name = 3;
+  optional string resolved_version = 4;
+}
+
+message AssetRef {
+  string asset_id = 1;
+  string kind = 2; // service, resource, process, host, package or source
+  optional string display_name = 3;
+}
+
+message Evidence {
+  string summary = 1; // Redacted before transmission.
+  repeated SourceLocation locations = 2;
+  repeated string telemetry_event_ids = 3;
+  repeated string artifact_ids = 4; // Run-scoped immutable, redacted artifacts.
+}
+
+message Cvss {
+  string version = 1; // 3.1 or 4.0
+  string vector = 2;
+  double base_score = 3;
+}
+
+message Epss {
+  double probability = 1;
+  double percentile = 2;
+  google.protobuf.Timestamp as_of = 3;
+  string advisory_id = 4;
+}
+
+message RiskContext {
+  Reachability reachability = 1;
+  string reachability_reason = 2;
+  repeated Cvss cvss = 3;
+  repeated Epss epss = 4;
+  optional bool externally_exposed = 5;
+}
+
+message PatchFile {
+  string artifact_uri = 1;
+  string base_sha256 = 2;
+}
+
+message Remediation {
+  string explanation = 1;
+  optional string unified_diff = 2;
+  repeated PatchFile files = 3;
+  repeated string verification_notes = 4;
+}
+
+message UnifiedFinding {
+  string schema_version = 1; // Exactly "1.0".
+  string finding_id = 2;     // UUID for this observation.
+  string run_id = 3;
+  string project_id = 4;
+  string fingerprint = 5;   // sha256:<64 lowercase hex>, no raw secrets.
+  Producer producer = 6;
+  Category category = 7;
+  string rule_id = 8;
+  string title = 9;
+  string description = 10;
+  Severity severity = 11;
+  double confidence = 12;   // Finite value in [0,1], not severity.
+  repeated SourceLocation locations = 13;
+  AssetRef asset = 14;
+  PackageRef package = 15;
+  repeated string advisory_ids = 16;
+  repeated string cwe_ids = 17;
+  Evidence evidence = 18;
+  RiskContext risk = 19;
+  Remediation remediation = 20;
+  google.protobuf.Timestamp observed_at = 21;
+  repeated string related_finding_ids = 22;
+}
+
+message ProcessIdentity {
+  uint64 pid = 1;
+  google.protobuf.Timestamp started_at = 2;
+  optional string executable_name = 3;
+  optional string container_id = 4;
+}
+
+message MetricSample {
+  string name = 1;
+  double value = 2;
+  string unit = 3; // UCUM unit, e.g. "By", "s", "1".
+}
+
+message LogRecord {
+  Severity severity = 1;
+  string message = 2; // Redacted, no credentials or request payloads.
+}
+
+message SpanRecord {
+  string operation = 1;
+  google.protobuf.Duration duration = 2;
+  bool error = 3;
+}
+
+message ThreadSample {
+  uint64 thread_id = 1;
+  string state = 2;
+  repeated string frames = 3; // Symbols only, no locals.
+}
+
+message SocketSample {
+  string transport = 1; // tcp or udp
+  string state = 2;
+  string local_endpoint_id = 3;  // Pseudonymous, tenant scoped.
+  string remote_endpoint_id = 4; // Raw IPs require separate diagnostic consent.
+}
+
+message ResourceSnapshot {
+  optional uint64 open_file_descriptors = 1;
+  optional uint64 open_handles = 2;
+  optional uint64 resident_memory_bytes = 3;
+  optional double cpu_cores_used = 4; // CPU seconds / wall seconds over interval.
+  google.protobuf.Duration sample_interval = 5;
+}
+
+message DebugTelemetryEvent {
+  string schema_version = 1;
+  string event_id = 2;
+  string run_id = 3;
+  string project_id = 4;
+  Producer producer = 5;
+  string host_id = 6;       // Pseudonymous, project scoped.
+  string agent_session_id = 7;
+  google.protobuf.Timestamp occurred_at = 8;
+  google.protobuf.Timestamp collected_at = 9;
+  uint64 monotonic_offset_ns = 10; // Relative to this agent session only.
+  optional uint64 clock_uncertainty_ns = 11;
+  ProcessIdentity process = 12;
+  optional string trace_id = 13; // 32 lowercase hex, nonzero.
+  optional string span_id = 14;  // 16 lowercase hex, nonzero; needs trace_id.
+  // Only configured low-cardinality, redacted attribute keys may be accepted.
+  map<string, string> attributes = 15;
+  oneof payload {
+    MetricSample metric = 16;
+    LogRecord log = 17;
+    SpanRecord span = 18;
+    ThreadSample thread = 19;
+    SocketSample socket = 20;
+    ResourceSnapshot resources = 21;
+  }
+}
+
+enum Capability {
+  CAPABILITY_UNSPECIFIED = 0;
+  CAPABILITY_SAST = 1;
+  CAPABILITY_SECRETS = 2;
+  CAPABILITY_SCA = 3;
+  CAPABILITY_SBOM = 4;
+  CAPABILITY_IAC = 5;
+  CAPABILITY_RUNTIME = 6;
+  CAPABILITY_TRIAGE = 7;
+  CAPABILITY_REMEDIATION = 8;
+}
+
+message DescribeRequest {
+  uint32 protocol_major = 1;
+}
+
+message PluginDescriptor {
+  string plugin_id = 1;
+  string version = 2;
+  uint32 protocol_major = 3;
+  repeated Capability capabilities = 4;
+  repeated string schema_versions = 5;
+  uint32 max_concurrent_runs = 6;
+  repeated string required_permissions = 7;
+}
+
+message ScanTarget {
+  oneof target {
+    string workspace_snapshot_id = 1;
+    ProcessIdentity process = 2;
+    string container_id = 3;
+    string findings_snapshot_id = 4;
+  }
+}
+
+message RunLimits {
+  google.protobuf.Duration wall_time = 1;
+  uint64 memory_bytes = 2;
+  uint64 max_input_bytes = 3;
+  uint64 max_output_bytes = 4;
+  uint32 max_files = 5;
+  uint32 max_subprocesses = 6;
+}
+
+message RunRequest {
+  string run_id = 1; // Unique attempt ID. Retries get new IDs.
+  string project_id = 2;
+  ScanTarget target = 3;
+  repeated Capability capabilities = 4;
+  RunLimits limits = 5;
+  string policy_snapshot_id = 6;
+  string input_digest = 7;
+}
+
+message Progress {
+  string phase = 1;
+  uint64 completed_units = 2;
+  optional uint64 total_units = 3;
+}
+
+message Diagnostic {
+  string code = 1;
+  string message = 2; // Redacted, no raw subprocess stderr.
+  bool retryable = 3;
+}
+
+enum ArtifactKind {
+  ARTIFACT_KIND_UNSPECIFIED = 0;
+  ARTIFACT_KIND_SARIF = 1;
+  ARTIFACT_KIND_CYCLONEDX = 2;
+  ARTIFACT_KIND_SPDX = 3;
+  ARTIFACT_KIND_THREAT_GRAPH = 4;
+  ARTIFACT_KIND_MERMAID = 5;
+  ARTIFACT_KIND_REDACTED_EVIDENCE = 6;
+}
+
+message Artifact {
+  string artifact_id = 1;
+  ArtifactKind kind = 2;
+  string relative_path = 3; // Inside run-scoped output directory only.
+  string sha256 = 4;
+  uint64 size_bytes = 5;
+  string media_type = 6;
+}
+
+enum RunStatus {
+  RUN_STATUS_UNSPECIFIED = 0;
+  RUN_STATUS_SUCCEEDED = 1;
+  RUN_STATUS_PARTIAL = 2;
+  RUN_STATUS_FAILED = 3;
+  RUN_STATUS_CANCELLED = 4;
+}
+
+message RunSummary {
+  RunStatus status = 1;
+  uint64 finding_count = 2;
+  uint64 telemetry_count = 3;
+  uint64 dropped_telemetry_count = 4;
+  repeated string coverage_gaps = 5;
+}
+
+message RunEvent {
+  string run_id = 1;
+  uint64 sequence = 2; // Starts at 1 and increases by 1 within an attempt.
+  oneof event {
+    UnifiedFinding finding = 3;
+    DebugTelemetryEvent telemetry = 4;
+    Progress progress = 5;
+    Diagnostic diagnostic = 6;
+    Artifact artifact = 7;
+    RunSummary completed = 8;
+  }
+}
+
+// Generated Go PluginServer is the implementation interface for Go adapters.
+// Cancellation uses the Run RPC context; no separate cancellation race.
+service Plugin {
+  rpc Describe(DescribeRequest) returns (PluginDescriptor);
+  rpc Run(RunRequest) returns (stream RunEvent);
+}
