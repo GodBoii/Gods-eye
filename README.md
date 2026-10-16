@@ -4,6 +4,27 @@ A local, offline defensive auditing CLI, with an architecture for a broader secu
 
 ## Run
 
+### Local dashboard
+
+Build the React/TypeScript frontend with Node.js 22.12 or newer, then serve it through Go:
+
+```powershell
+cd apps/web
+npm ci
+npm run build
+cd ../..
+go build -o bin/godseye.exe ./cmd/godseye
+.\bin\godseye.exe serve --root .
+```
+
+Open `http://127.0.0.1:8765`. The Overview, Assets, Checks and Coverage pages use the real backend. Source scans are restricted to the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint, without crawling or following redirects. The source and web check modules are native code; no external pentesting tools are integrated.
+
+Inventory is saved in `.godseye/assets.json`. Check history lasts for the server session, capped at 20 runs. Export results before stopping the server. Do not put credentials in asset names or targets. This local server has no shared-user authentication and must not be exposed through a public reverse proxy.
+
+Use `--port`, `--web` and `--state` to change the port, built-frontend directory and inventory directory. The default paths are relative to the launch directory. `npm run dev` is a frontend-only development server; use the Go-served production build for a fully connected dashboard.
+
+### Command-line scan
+
 Requires Go 1.25 or newer. The current implementation has been built and tested with Go 1.27.2 on Windows.
 
 ```powershell
@@ -34,9 +55,9 @@ The default limits are 10,000 files, 1 MiB per file, a 64 MiB input reservation 
 
 ## Coverage and limits
 
-This is the first runnable implementation, not the completed platform. It has no daemon, durable job queue, external plugin execution, gRPC server, SAST data-flow analysis, dependency auditing, runtime collection, VPN or proxy deployment yet. The generated schema does not mean all protocol validation and lifecycle behaviors are implemented.
+This is an early implementation, not the completed platform. The local dashboard server supports one active check at a time. It has no durable job queue, external plugin execution, gRPC server, SAST data-flow analysis, dependency auditing, runtime collection, VPN or proxy deployment yet. The generated schema does not mean all protocol validation and lifecycle behaviors are implemented.
 
-Only UTF-8 text is inspected. Binary/non-UTF-8 content, unreadable or oversized files, and exhausted limits mark a scan incomplete. The directories `.git`, `node_modules`, `vendor`, `.venv`, `bin` and `reports` are policy exclusions and their counts are reported. Symlinks and special files are excluded. Git history, archives and `.gitignore` semantics are not implemented. Other hidden files, including `.env`, are scanned.
+Only UTF-8 text is inspected. Binary/non-UTF-8 content, unreadable or oversized files, and exhausted limits mark a scan incomplete. The directories `.git`, `node_modules`, `vendor`, `.venv`, `bin`, `reports`, `.godseye` and `dist` are policy exclusions and their counts are reported. Symlinks and special files are excluded. Git history, archives and `.gitignore` semantics are not implemented. Other hidden files, including `.env`, are scanned.
 
 Scan an idle local checkout. The scanner confines opens with Go's `os.Root`, but does not create an immutable snapshot or sandbox a hostile, concurrently modified directory. Timeouts are cooperative and cannot interrupt a blocked operating-system filesystem call. Directory enumeration and the Go runtime are not subject to a hard memory sandbox. Fingerprints use rule, path and match ordinal; inserting another match of the same rule before an existing one can change its fingerprint.
 
@@ -57,5 +78,7 @@ The race detector requires a supported C compiler on Windows. Protobuf bindings 
 - [Canonical Protobuf schema](api/godseye/v1/plugin.proto)
 - [Open-source policy and licensing](docs/open-source.md)
 - [Verification results and first scan benchmark](docs/verification.md)
+- [Asset coverage, native capability plan and operating systems](docs/platform-scope.md)
+- [God's Eye View repository review](docs/reference-review.md)
 
 The architecture separates live proxy/VPN traffic from audit workers. It does not promise universal anonymity or claim measured network performance.
