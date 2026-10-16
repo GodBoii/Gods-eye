@@ -14,7 +14,7 @@ The API deliberately returns run summaries during polling and fetches full evide
 
 A concurrency regression test verifies that a stalled report download does not block workspace state requests. Inventory reads are capped before JSON decoding, with a test rejecting oversized saved inventories.
 
-No live third-party target was pentested during verification. Outbound HTTPS success behavior is not an end-to-end production certification. The race detector limitation below still applies.
+The subsequent [live domain and codebase verification](live-verification-2026-10-16.md) exercised the user's explicitly authorized domain and passed 13 live smoke checks. The initial checks above were followed by actual outbound HTTPS verification; the implemented coverage remains limited to one HEAD response. The race detector limitation below still applies.
 
 ## CLI baseline
 
