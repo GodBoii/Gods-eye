@@ -1,5 +1,23 @@
 # Initial CLI verification
 
+## Dashboard verification, 0.2
+
+The Go dashboard API tests cover inventory persistence, workspace traversal rejection, authorization acknowledgement, unknown JSON fields, Host/Origin and custom-header protections, scan admission, cancellation propagation, the full scan/report lifecycle, redaction, and compact summary responses. Native HTTPS checker tests cover private/reserved address rejection, invalid URLs and cautious header-policy interpretation. `go test ./...` and `go vet ./...` pass.
+
+The React production build passes TypeScript checking. `npm audit --omit=dev` reported zero known vulnerabilities at verification time. This is a dependency database check, not a guarantee of security.
+
+Windows amd64 and Linux amd64 binaries build successfully. Linux runtime behavior has not been exercised on an Ubuntu host in this session.
+
+Browser verification exercised real local asset registration, preparing and launching a source scan, completion, a synthetic credential finding, details expansion, filtering and a JSON download. The synthetic token was withheld from the report. Desktop and 390px mobile layouts were inspected; the document did not overflow horizontally. Browser console inspection showed no warnings or errors during these workflows. History and wide tables may scroll within their own panels on small screens.
+
+The API deliberately returns run summaries during polling and fetches full evidence only for the selected check. Polling slows when idle and pauses network requests in hidden tabs. Inventory persists; run history does not yet survive a server restart.
+
+A concurrency regression test verifies that a stalled report download does not block workspace state requests. Inventory reads are capped before JSON decoding, with a test rejecting oversized saved inventories.
+
+No live third-party target was pentested during verification. Outbound HTTPS success behavior is not an end-to-end production certification. The race detector limitation below still applies.
+
+## CLI baseline
+
 Verified on 2026-10-16 using Go 1.27.2, Windows amd64, AMD Ryzen 5 5600H. This record covers the built-in secret-pattern scanner and report writers, not the future daemon, network services or external plugins.
 
 ## Checks
