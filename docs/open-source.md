@@ -1,6 +1,8 @@
 # Open-source policy
 
-Original project code and scanner rules use Apache-2.0. The only direct Go dependency in the initial CLI is Google's Protobuf runtime, BSD-3-Clause. Dependency versions and integrity hashes are pinned in go.mod and go.sum. The CLI scans offline and has no analytics, API key, subscription or external account requirement.
+Original project code and scanner rules use Apache-2.0. The only direct Go dependency is Google's Protobuf runtime, BSD-3-Clause. Dependency versions and integrity hashes are pinned in go.mod and go.sum. The source scanner runs offline and has no analytics, API key, subscription or external account requirement. The optional HTTPS checker contacts only the target explicitly submitted for a check.
+
+The frontend uses React, React DOM, scheduler and Zod under MIT licenses. Their complete notices are retained in `licenses/frontend.txt`. Vite and TypeScript build the frontend; package-lock.json pins the dependency graph. No external fonts, hosted telemetry or paid data feeds are required. The browser downloads JavaScript from the local server only.
 
 Keep upstream copyright and license notices with binary/source distributions. `NOTICE` identifies dependencies; the `licenses/` directory preserves their full license text. Generated bindings are checked in, so users need only Go to build the CLI. Python and grpcio-tools are development tools for regenerating the contract, not runtime dependencies.
 
