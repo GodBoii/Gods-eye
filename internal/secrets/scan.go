@@ -92,7 +92,7 @@ func Scan(ctx context.Context, directory, project string, limits Limits) (Result
 			}
 			if entry.IsDir() {
 				switch entry.Name() {
-				case ".git", "node_modules", "vendor", ".venv", "bin", "reports":
+				case ".git", "node_modules", "vendor", ".venv", "bin", "reports", ".godseye", "dist":
 					state.excluded++
 					return fs.SkipDir
 				}
