@@ -71,6 +71,8 @@ go vet ./...
 go test -race ./...
 ```
 
+With the dashboard running, `pwsh -File scripts/smoke.ps1` exercises the real local API, synthetic detection, exports, cancellation, limits and overwrite protection. Add `-Website https://your-authorized-domain/` only when you want to check that explicitly authorized public HTTPS endpoint. See [live verification results](docs/live-verification-2026-10-16.md) for the recorded domain and local tests.
+
 The race detector requires a supported C compiler on Windows. Protobuf bindings were generated using `protoc-gen-go v1.36.10` and the compiler bundled with `grpcio-tools 1.84.0`. See the generation header for the compiler version. Generate with `--go_out=. --go_opt=module=godseye` and `api/` as the source include root.
 
 - [Architecture and planned monorepo](docs/architecture.md)
