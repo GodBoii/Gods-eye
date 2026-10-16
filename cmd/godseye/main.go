@@ -23,8 +23,11 @@ func main() {
 }
 
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "serve" {
+		return serve(ctx, args[1:], stdout, stderr)
+	}
 	if len(args) == 1 && args[0] == "version" {
-		fmt.Fprintln(stdout, "godseye 0.1.0")
+		fmt.Fprintln(stdout, "godseye 0.2.0")
 		return 0
 	}
 	if len(args) == 0 || args[0] != "scan" {
