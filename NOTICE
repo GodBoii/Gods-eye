@@ -21,3 +21,8 @@ Build-time contract compiler:
 
 No commercial scanner, SaaS account, or restricted Semgrep registry rule
 bundle is included. See docs/open-source.md for distribution requirements.
+
+Dashboard runtime dependencies: React, React DOM, scheduler and Zod.
+These are MIT-licensed. Full upstream notices are in licenses/frontend.txt.
+Frontend build tools include Vite (MIT) and TypeScript (Apache-2.0).
+Exact dependency versions and hashes are recorded in apps/web/package-lock.json.
