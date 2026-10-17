@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Assets } from "./Assets";
 import { Checks } from "./Checks";
+import { EarthConsole } from "./EarthConsole";
 import {
   categories,
   categoryLabel,
@@ -14,7 +15,7 @@ import {
 import type { Asset, State } from "./api";
 
 const WorldView = lazy(() => import("./world/WorldView"));
-type Page = "Overview" | "Assets" | "Checks" | "Coverage" | "World view";
+type Page = "Overview" | "Assets" | "Checks" | "Coverage" | "World view" | "Earth console";
 type Load =
   | { kind: "loading" }
   | { kind: "ready"; data: State }
@@ -141,6 +142,7 @@ export default function App() {
               "Checks",
               "Coverage",
               "World view",
+              "Earth console",
             ] satisfies Page[]
           ).map((item, index) => (
             <button
@@ -201,6 +203,8 @@ export default function App() {
                       ? "Follow the evidence."
                       : page === "World view"
                         ? "Explore the public picture."
+                        : page === "Earth console"
+                          ? "Beyond the workspace."
                         : "Know the boundaries."}
               </h1>
               <p>
@@ -212,6 +216,8 @@ export default function App() {
                       ? "Real check results, with coverage and limitations kept visible."
                       : page === "World view"
                         ? "Earthquakes, natural events, regional aircraft and orbital context. No provider keys."
+                        : page === "Earth console"
+                          ? "The full geospatial application, rebuilt for public sources."
                         : "What this build can inspect, and what still needs an engine."}
               </p>
             </div>
@@ -240,6 +246,7 @@ export default function App() {
           )}
           {data && (
             <>
+              {page === "Earth console" && <EarthConsole />}
               {page === "World view" && (
                 <Suspense
                   fallback={
