@@ -41,7 +41,7 @@ export function createControls({ state: layerState, services, parts, source }) {
 
     icon: '⌖',
 
-    source: 'OpenStreetMap + optional Google Maps Places',
+    source: 'OpenStreetMap',
 
     updateInterval: 0,
 
@@ -53,7 +53,7 @@ export function createControls({ state: layerState, services, parts, source }) {
 
     /** Request a one-shot Google Maps Places search around the current map view. */
     searchNearby() {
-      layerState.googleSearchRequested = true;
+      layerState.googleSearchRequested = false;
       return parts.ingestion.loadInstallations();
     },
 
