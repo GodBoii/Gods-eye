@@ -148,6 +148,7 @@ func DNS(ctx context.Context, domain string) (*Report, error) {
 		if dnsErr, ok := err.(*net.DNSError); ok && dnsErr.IsNotFound {
 			r.observe(kind, domain, "No record returned by the configured resolver")
 		} else {
+			r.Limited = true
 			r.gap(kind + " lookup failed or timed out.")
 		}
 	}
@@ -183,7 +184,7 @@ func DNS(ctx context.Context, domain string) (*Report, error) {
 			}
 		}
 	}
-	if txtErr == nil && spf == 0 {
+	if (txtErr == nil || isNotFound(txtErr)) && spf == 0 {
 		r.finding("low", "No SPF policy observed", domain, "No v=spf1 TXT record was returned. This may be intentional for a domain that does not send mail.")
 	}
 	if spf > 1 {
