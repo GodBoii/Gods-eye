@@ -17,7 +17,7 @@ export function createControls({ state: layerState, services, parts, source }) {
 
     icon: '📹',
 
-    source: 'CCTV + Street View fallback',
+    source: 'Public traffic cameras',
 
     updateInterval: DEFAULT_UPDATE_INTERVAL_MS,
 
