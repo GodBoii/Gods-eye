@@ -17,6 +17,7 @@ import (
 	"godseye/internal/report"
 	"godseye/internal/secrets"
 	"godseye/internal/webcheck"
+	"godseye/internal/workbench"
 	"godseye/internal/world"
 )
 
@@ -47,13 +48,14 @@ type Run struct {
 	cancel       context.CancelFunc
 }
 type Server struct {
-	mu      sync.Mutex
-	root    string
-	file    string
-	assets  []Asset
-	runs    []*Run
-	context context.Context
-	world   *world.Service
+	mu       sync.Mutex
+	root     string
+	file     string
+	assets   []Asset
+	runs     []*Run
+	context  context.Context
+	world    *world.Service
+	evidence *workbench.Store
 }
 
 func New(ctx context.Context, root, stateDir string) (*Server, error) {
@@ -74,11 +76,16 @@ func New(ctx context.Context, root, stateDir string) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx, world: world.New(filepath.Join(stateDir, "world-cache"))}, nil
+	evidence, err := workbench.OpenStore(filepath.Join(stateDir, "evidence"))
+	if err != nil {
+		return nil, fmt.Errorf("open workbench evidence: %w", err)
+	}
+	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx, world: world.New(filepath.Join(stateDir, "world-cache")), evidence: evidence}, nil
 }
 
 func (s *Server) Handler(host, dist string) http.Handler {
 	mux := http.NewServeMux()
+	s.registerWorkbench(mux)
 	mux.HandleFunc("GET /api/state", s.state)
 	mux.HandleFunc("GET /api/world/{layer}", func(w http.ResponseWriter, r *http.Request) {
 		snapshot, ok := s.world.Snapshot(r.Context(), r.PathValue("layer"))
