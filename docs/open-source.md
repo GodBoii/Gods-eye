@@ -4,6 +4,8 @@ Original project code and scanner rules use Apache-2.0. The only direct Go depen
 
 The frontend uses React, React DOM, scheduler and Zod under MIT licenses. Their complete notices are retained in `licenses/frontend.txt`. Vite and TypeScript build the frontend; package-lock.json pins the dependency graph. No external fonts, hosted telemetry or paid data feeds are required. The browser downloads JavaScript from the local server only.
 
+World view adds D3 libraries under ISC and satellite.js under MIT, with notices in `licenses/world-libraries.txt`. Two MIT source helpers from God's Eye View are vendored at a pinned commit; `licenses/gods-eye-view.txt` retains the copyright and permission grant. Natural Earth land geometry is public domain. Live public feeds have separate provider terms. ADSB.lol aircraft data is ODbL 1.0 and retains attribution in the interface and exports. See [World view](world-view.md) for source URLs, pinned geometry provenance, exact coverage and redistribution conditions.
+
 Keep upstream copyright and license notices with binary/source distributions. `NOTICE` identifies dependencies; the `licenses/` directory preserves their full license text. Generated bindings are checked in, so users need only Go to build the CLI. Python and grpcio-tools are development tools for regenerating the contract, not runtime dependencies.
 
 Do not assume a free hosted tier is open source. Every future scanner, rule pack, dataset and optional service needs a separate license check before integration. Pin engine versions and verify downloaded checksums. Do not use `latest` tags in release builds.
