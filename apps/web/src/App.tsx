@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 import { Assets } from "./Assets";
 import { Checks } from "./Checks";
 import { EarthConsole } from "./EarthConsole";
+import "./theme.css";
 import {
   categories,
   categoryLabel,
@@ -15,14 +16,25 @@ import {
 import type { Asset, State } from "./api";
 
 const WorldView = lazy(() => import("./world/WorldView"));
-type Page = "Overview" | "Assets" | "Checks" | "Coverage" | "World view" | "Earth console";
+const Workbench = lazy(() => import("./lab/Workbench"));
+const ToolLibrary = lazy(() =>
+  import("./lab/Workbench").then((module) => ({ default: module.ToolLibrary })),
+);
+type Page =
+  | "Workbench"
+  | "Overview"
+  | "Assets"
+  | "Checks"
+  | "Tools"
+  | "World view"
+  | "Earth console";
 type Load =
   | { kind: "loading" }
   | { kind: "ready"; data: State }
   | { kind: "failed"; error: string };
 
 export default function App() {
-  const [page, setPage] = useState<Page>("Overview");
+  const [page, setPage] = useState<Page>("Workbench");
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [revision, setRevision] = useState(0);
   const [kind, setKind] = useState("source");
@@ -111,7 +123,9 @@ export default function App() {
     ) ?? false;
   const latest = data?.runs[0];
   return (
-    <div className="app-shell">
+    <div
+      className={`app-shell${page === "World view" || page === "Earth console" ? "" : " security-skin"}`}
+    >
       <a href="#main" className="skip-link">
         Skip to workspace
       </a>
@@ -137,10 +151,11 @@ export default function App() {
         <nav aria-label="Main navigation">
           {(
             [
+              "Workbench",
               "Overview",
               "Assets",
               "Checks",
-              "Coverage",
+              "Tools",
               "World view",
               "Earth console",
             ] satisfies Page[]
@@ -173,7 +188,7 @@ export default function App() {
             Your evidence.
           </p>
           <small>
-            Local source checks and explicit, authorized HTTPS inspection.
+            Native diagnostics, offline analysis and imported evidence.
           </small>
         </div>
         <div className="sidebar-bottom">
@@ -195,30 +210,34 @@ export default function App() {
             <div>
               <span className="eyebrow">OBSERVE / VERIFY / REVIEW</span>
               <h1>
-                {page === "Overview"
-                  ? "Know what you’re exposing."
-                  : page === "Assets"
-                    ? "Define your scope."
-                    : page === "Checks"
-                      ? "Follow the evidence."
-                      : page === "World view"
-                        ? "Explore the public picture."
-                        : page === "Earth console"
-                          ? "Beyond the workspace."
-                        : "Know the boundaries."}
+                {page === "Workbench"
+                  ? "Security workbench."
+                  : page === "Overview"
+                    ? "Workspace overview."
+                    : page === "Assets"
+                      ? "Asset inventory."
+                      : page === "Checks"
+                        ? "Check evidence."
+                        : page === "World view"
+                          ? "Explore the public picture."
+                          : page === "Earth console"
+                            ? "Beyond the workspace."
+                            : "Tool coverage."}
               </h1>
               <p>
-                {page === "Overview"
-                  ? "A clear view of your systems, checks and security evidence."
-                  : page === "Assets"
-                    ? "Sites, APIs, source code and the infrastructure behind them."
-                    : page === "Checks"
-                      ? "Real check results, with coverage and limitations kept visible."
-                      : page === "World view"
-                        ? "Earthquakes, natural events, regional aircraft and orbital context. No provider keys."
-                        : page === "Earth console"
-                          ? "The full geospatial application, rebuilt for public sources."
-                        : "What this build can inspect, and what still needs an engine."}
+                {page === "Workbench"
+                  ? "Import assessments. Inspect files. Trace relationships. Work locally."
+                  : page === "Overview"
+                    ? "A clear view of your systems, checks and security evidence."
+                    : page === "Assets"
+                      ? "Sites, APIs, source code and the infrastructure behind them."
+                      : page === "Checks"
+                        ? "Real check results, with coverage and limitations kept visible."
+                        : page === "World view"
+                          ? "Earthquakes, natural events, regional aircraft and orbital context. No provider keys."
+                          : page === "Earth console"
+                            ? "The full geospatial application, rebuilt for public sources."
+                            : "What each integration provides, its source, license and limits."}
               </p>
             </div>
             <span className="build-label">
@@ -246,6 +265,17 @@ export default function App() {
           )}
           {data && (
             <>
+              {page === "Workbench" && (
+                <Suspense
+                  fallback={
+                    <div className="panel empty" role="status">
+                      Loading workbench…
+                    </div>
+                  }
+                >
+                  <Workbench />
+                </Suspense>
+              )}
               {page === "Earth console" && <EarthConsole />}
               {page === "World view" && (
                 <Suspense
@@ -294,8 +324,8 @@ export default function App() {
                     </div>
                     <div>
                       <span>Native capabilities</span>
-                      <strong>02</strong>
-                      <small>Secret patterns / HTTPS response</small>
+                      <strong>09</strong>
+                      <small>Scans, diagnostics and offline analysis</small>
                     </div>
                   </section>
                   <div className="overview-grid">
@@ -461,73 +491,12 @@ export default function App() {
                   cancel={(id) => void cancel(id)}
                 />
               )}
-              {page === "Coverage" && (
-                <>
-                  <section className="panel">
-                    <div className="panel-title">
-                      <h2>Capability coverage</h2>
-                      <span className="badge neutral">
-                        No external tool integrations
-                      </span>
-                    </div>
-                    <div className="table-scroll">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Asset category</th>
-                            <th>Available now</th>
-                            <th>Depth</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {categories.map((item) => (
-                            <tr key={item.id}>
-                              <td>
-                                <strong>{item.label}</strong>
-                              </td>
-                              <td>{item.coverage}</td>
-                              <td>
-                                <span
-                                  className={`badge ${item.available ? "observed" : "neutral"}`}
-                                >
-                                  {item.available
-                                    ? "Limited checks"
-                                    : "Not assessed"}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </section>
-                  <div className="coverage-notes">
-                    <section className="panel">
-                      <h2>A platform you can extend</h2>
-                      <p>
-                        Dependency auditing, API schemas, runtime telemetry,
-                        infrastructure policy, graph analysis and network
-                        diagnostics are planned. Registering an asset does not
-                        enable those checks.
-                      </p>
-                    </section>
-                    <section className="panel">
-                      <h2>Windows now. Linux when needed.</h2>
-                      <p>
-                        This control panel runs locally on Windows. Ubuntu is
-                        the server target for future network and privileged
-                        collectors. Arch is optional, not a requirement.
-                      </p>
-                    </section>
-                  </div>
-                  <div className="notice">
-                    No tool has access to “all internet data.” Coverage depends
-                    on explicit targets, available data, credentials,
-                    permissions and implemented checks. Private data and
-                    authenticated application routes are not collected by this
-                    build.
-                  </div>
-                </>
+              {page === "Tools" && (
+                <Suspense
+                  fallback={<p role="status">Loading tool coverage…</p>}
+                >
+                  <ToolLibrary />
+                </Suspense>
               )}
             </>
           )}
