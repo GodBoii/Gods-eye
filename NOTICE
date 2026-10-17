@@ -42,3 +42,21 @@ World view uses D3 (ISC) and satellite.js (MIT); notices are retained in
 licenses/world-libraries.txt. Natural Earth land geometry is public domain.
 ADSB.lol live aircraft data is ODbL 1.0, with attribution in the UI and exports.
 Public feed data is separate from the source-code license. See docs/world-view.md.
+
+The security workbench adapts two helper algorithms from gchq/CyberChef,
+commit cc70a4530b86aff4bc40ccc74b1ad4857eccdca2:
+  src/core/operations/Entropy.mjs, calculateShannonEntropy
+  Crown Copyright 2016, n1474335
+  src/core/operations/DefangURL.mjs, defangURL
+  Crown Copyright 2018, arnydo and n1474335
+Apache-2.0. Full license: licenses/cyberchef.txt.
+The adapted functions identify changes in their source header.
+
+The manual profile reviewer includes nine name/URL/regex templates from
+sherlock-project/sherlock, commit e40a45ec2a074b90703b3b4b842c8a3adbd6ada3,
+sherlock_project/resources/data.json. Copyright (c) 2019 Sherlock Project.
+MIT. Full license: licenses/sherlock.txt.
+
+Other tool names identify native capability subsets or report compatibility.
+Their engines, commercial services and rule packs are not bundled.
+See docs/tool-workbench.md for the implemented scope and source review.
