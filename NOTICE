@@ -4,6 +4,14 @@ Copyright 2026 God's Eye contributors
 Original source code and rules are licensed under Apache License 2.0.
 Generated Protobuf bindings are generated from this project's schema.
 
+The complete God's Eye View source distribution is adapted under apps/earth.
+Copyright (c) 2026 Bilawal Sidhu. Source license: MIT.
+Upstream: https://github.com/bilawalsidhu/gods-eye-view
+Revision: 1df2a272cf7cfbb2f1a4c637c897e90719b0af95
+Retain apps/earth/LICENSE and DATA_SOURCES.md. The source license does not
+relicense its third-party geographic data, event imagery or 3D models.
+See docs/earth-edition.md for the active keyless configuration.
+
 Runtime dependency:
   google.golang.org/protobuf v1.36.10
   Copyright The Go Authors
