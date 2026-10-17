@@ -115,9 +115,9 @@ export function Globe({
         <title>Public-source world view</title>
         <defs>
           <radialGradient id="ocean">
-            <stop offset="0" stopColor="#1b333a" />
-            <stop offset=".85" stopColor="#10272e" />
-            <stop offset="1" stopColor="#0b161c" />
+            <stop offset="0" stopColor="#161a13" />
+            <stop offset=".85" stopColor="#0b0d09" />
+            <stop offset="1" stopColor="#030403" />
           </radialGradient>
           <clipPath id="world-disc">
             <circle cx="360" cy="270" r={228 * view.zoom} />
