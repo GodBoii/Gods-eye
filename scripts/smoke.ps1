@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param(
     [uri]$BaseUrl = 'http://127.0.0.1:8765',
+    [string]$SourceTarget = 'internal',
     [uri]$Website
 )
 
@@ -89,7 +90,9 @@ try {
         Assert-Check 'Live website checker' ($remote.status -eq 'completed' -and @($remote.checks).Count -ge 4) $remote.status
     }
 
-    $started = Start-Check '.'
+    # The full Earth source distribution also contains binary models and large datasets.
+    # Exercise the native source directory; binary omissions are tested explicitly below.
+    $started = Start-Check $SourceTarget
     $source = Wait-Check $started.id
     Assert-Check 'Real codebase scan' ($source.status -eq 'completed' -and $source.files -gt 0) "$($source.files) files, $($source.findingCount) candidates."
     $null = Save-Report $source.id 'json' (Join-Path $testRoot 'codebase.json')
@@ -147,3 +150,7 @@ try {
     $checks | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $testRoot 'checks.json')
     Write-Host "Evidence directory: $testRoot"
 }
+
+# The overwrite check intentionally receives native exit code 2. A successful
+# smoke run must not leak that expected rejection into its caller's exit status.
+$global:LASTEXITCODE = 0
