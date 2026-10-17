@@ -1,21 +1,27 @@
 {
   "name": "godseye-dashboard",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && vite build"
+    "build": "tsc --noEmit && vite build",
+    "test": "tsx --test src/world/*.test.ts"
   },
   "dependencies": {
+    "d3-geo": "3.1.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "satellite.js": "6.0.2",
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@types/d3-geo": "3.1.1",
+    "@types/node": "22.15.30",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "tsx": "4.23.15",
     "typescript": "7.0.2",
     "vite": "8.3.4"
   }
