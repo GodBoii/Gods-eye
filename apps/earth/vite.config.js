@@ -23,6 +23,7 @@ import { cycloneProxy } from './server/providers/cyclones.js';
 import { windProxy } from './server/providers/wind.js';
 import { apiNotFoundPlugin } from './server/standalone/api-not-found.js';
 import { installRouteMiddleware } from './server/providers/places/routes.js';
+import { clearProviderCredentials } from './src/free/policy.js';
 
 const freeRouting = () => ({ name: 'keyless-osrm-routing',
   configureServer(server) { installRouteMiddleware(server.middlewares); },
@@ -31,6 +32,7 @@ const freeRouting = () => ({ name: 'keyless-osrm-routing',
 
 // No dotenv loading, credential setup endpoint, paid proxy, or MCP server.
 export default defineConfig(({ command }) => {
+  clearProviderCredentials(process.env);
   const config = createBrowserViteConfig({ command, host: '127.0.0.1', port: 4173,
     googleApiKey: '', cesiumToken: '', mapillaryToken: '',
     plugins: [freeEditionGateway(), celestrakProxy(), rocketLaunchesProxy(), terrainHeightsProxy(), adsbdbProxy(),
