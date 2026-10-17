@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Assets } from "./Assets";
 import { Checks } from "./Checks";
@@ -13,7 +13,8 @@ import {
 } from "./api";
 import type { Asset, State } from "./api";
 
-type Page = "Overview" | "Assets" | "Checks" | "Coverage";
+const WorldView = lazy(() => import("./world/WorldView"));
+type Page = "Overview" | "Assets" | "Checks" | "Coverage" | "World view";
 type Load =
   | { kind: "loading" }
   | { kind: "ready"; data: State }
@@ -30,6 +31,9 @@ export default function App() {
   const [action, setAction] = useState<"idle" | "busy">("idle");
   const [error, setError] = useState("");
   const refresh = () => setRevision((value) => value + 1);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
   useEffect(() => {
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
@@ -130,28 +134,34 @@ export default function App() {
         </div>
         <span className="nav-heading">WORKSPACE</span>
         <nav aria-label="Main navigation">
-          {(["Overview", "Assets", "Checks", "Coverage"] satisfies Page[]).map(
-            (item, index) => (
-              <button
-                key={item}
-                aria-current={page === item ? "page" : undefined}
-                className={page === item ? "nav-active" : ""}
-                onClick={() => {
-                  setPage(item);
-                  setError("");
-                }}
-              >
-                <span className="nav-number">0{index + 1}</span>
-                {item}
-                {item === "Assets" && (
-                  <span className="nav-count">{data?.assets.length ?? 0}</span>
-                )}
-                {item === "Checks" && running && (
-                  <span className="activity-dot" />
-                )}
-              </button>
-            ),
-          )}
+          {(
+            [
+              "Overview",
+              "Assets",
+              "Checks",
+              "Coverage",
+              "World view",
+            ] satisfies Page[]
+          ).map((item, index) => (
+            <button
+              key={item}
+              aria-current={page === item ? "page" : undefined}
+              className={page === item ? "nav-active" : ""}
+              onClick={() => {
+                setPage(item);
+                setError("");
+              }}
+            >
+              <span className="nav-number">0{index + 1}</span>
+              {item}
+              {item === "Assets" && (
+                <span className="nav-count">{data?.assets.length ?? 0}</span>
+              )}
+              {item === "Checks" && running && (
+                <span className="activity-dot" />
+              )}
+            </button>
+          ))}
         </nav>
         <div className="sidebar-note">
           <span className="eyebrow">CONTROL BOUNDARY</span>
@@ -167,7 +177,7 @@ export default function App() {
         <div className="sidebar-bottom">
           <span className="status-dot" />
           <span>
-            Local server <small>v0.2 · open source</small>
+            Local server <small>v0.3 · open source</small>
           </span>
         </div>
       </aside>
@@ -189,7 +199,9 @@ export default function App() {
                     ? "Define your scope."
                     : page === "Checks"
                       ? "Follow the evidence."
-                      : "Know the boundaries."}
+                      : page === "World view"
+                        ? "Explore the public picture."
+                        : "Know the boundaries."}
               </h1>
               <p>
                 {page === "Overview"
@@ -198,13 +210,15 @@ export default function App() {
                     ? "Sites, APIs, source code and the infrastructure behind them."
                     : page === "Checks"
                       ? "Real check results, with coverage and limitations kept visible."
-                      : "What this build can inspect, and what still needs an engine."}
+                      : page === "World view"
+                        ? "Earthquakes, natural events, regional aircraft and orbital context. No provider keys."
+                        : "What this build can inspect, and what still needs an engine."}
               </p>
             </div>
             <span className="build-label">
               LOCAL EDITION
               <br />
-              <strong>0.2 / ACTIVE BUILD</strong>
+              <strong>0.3 / ACTIVE BUILD</strong>
             </span>
           </div>
           {error && (
@@ -226,6 +240,17 @@ export default function App() {
           )}
           {data && (
             <>
+              {page === "World view" && (
+                <Suspense
+                  fallback={
+                    <div className="panel empty" role="status">
+                      Loading world view…
+                    </div>
+                  }
+                >
+                  <WorldView />
+                </Suspense>
+              )}
               {page === "Overview" && (
                 <>
                   <section className="metrics" aria-label="Workspace summary">
