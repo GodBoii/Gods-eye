@@ -27,7 +27,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return serve(ctx, args[1:], stdout, stderr)
 	}
 	if len(args) == 1 && args[0] == "version" {
-		fmt.Fprintln(stdout, "godseye 0.2.0")
+		fmt.Fprintln(stdout, "godseye 0.3.0")
 		return 0
 	}
 	if len(args) == 0 || args[0] != "scan" {
