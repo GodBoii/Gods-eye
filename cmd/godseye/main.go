@@ -23,6 +23,9 @@ func main() {
 }
 
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "lab" {
+		return lab(ctx, args[1:], stdout, stderr)
+	}
 	if len(args) > 0 && args[0] == "serve" {
 		return serve(ctx, args[1:], stdout, stderr)
 	}
@@ -31,7 +34,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 0
 	}
 	if len(args) == 0 || args[0] != "scan" {
-		fmt.Fprintln(stderr, "Usage: godseye scan [--format json|sarif] [--out FILE] [--project ID] [--timeout 30s] DIRECTORY\n       godseye version")
+		fmt.Fprintln(stderr, "Usage: godseye scan [--format json|sarif] [--out FILE] [--project ID] [--timeout 30s] DIRECTORY\n       godseye lab catalog|import|file|pcap|iam|tcp|dns [flags] [FILE]\n       godseye serve [flags]\n       godseye version")
 		return 2
 	}
 	flags := flag.NewFlagSet("scan", flag.ContinueOnError)
