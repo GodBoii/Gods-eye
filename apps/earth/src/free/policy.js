@@ -11,6 +11,11 @@ export const EXCLUDED = Object.freeze([
 ]);
 export const BLOCKED_LAYERS = new Set(['traffic', 'ais-live-vessels', 'street-level', 'local-firms']);
 export const BLOCKED_SOURCES = ['traffic', 'vessels', 'mapillary', 'firms'];
+const CREDENTIAL_ENV = ['GOOGLE_MAPS_API_KEY', 'GOOGLE_MAPS_SERVER_API_KEY', 'CESIUM_ION_TOKEN', 'OPENAI_API_KEY', 'MAPILLARY_CLIENT_TOKEN', 'TOMTOM_API_KEY', 'AISSTREAM_API_KEY', 'FIRMS_MAP_KEY', 'OPENSKY_CLIENT_ID', 'OPENSKY_CLIENT_SECRET', 'OPENSKY_USERNAME', 'OPENSKY_PASSWORD', 'LL2_API_TOKEN', 'TFL_APP_KEY'];
+/** Remove optional credential fallbacks only inside this server process. */
+export function clearProviderCredentials(environment) {
+  for (const key of CREDENTIAL_ENV) delete environment[key];
+}
 export function layerAllowed(id) { return typeof id === 'string' && !BLOCKED_LAYERS.has(id); }
 export function blockedApi(path) {
   const normalized = path.toLowerCase().replace(/\/+$/, '');
