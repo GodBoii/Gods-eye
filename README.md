@@ -2,6 +2,10 @@
 
 A local defensive auditing dashboard and CLI, with a separate public-source World view. The source scanner runs offline; optional HTTPS checks and world feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
 
+The complete God's Eye View source is now copied into `apps/earth` as a separate keyless Earth console with a minimal black interface. Open its [local console](http://127.0.0.1:4173/) for the full 3D globe, public-source layers, saved views, personal pins, weather inspection and map tools. The Excluded section lists disconnected paid and credential-dependent providers. The existing scanner, dashboard and compact World view remain available. See the [edition guide](docs/earth-edition.md) for exact scope and source/data attribution.
+
+On Windows, build and start both workspaces with `pwsh -File scripts/start.ps1 -Build`. Later starts can omit `-Build`. The Earth process is separate from the Go dashboard and runs on loopback port 4173. Its active configuration never loads provider credentials. The full upstream source includes historical provider modules for provenance; they are disconnected from this edition.
+
 ## Run
 
 ### Local dashboard
