@@ -1,6 +1,6 @@
 # God's Eye
 
-A local, offline defensive auditing CLI, with an architecture for a broader security and private-networking platform. Original code and rules are Apache-2.0. No account, subscription, API key or paid service is needed.
+A local defensive auditing dashboard and CLI, with a separate public-source World view. The source scanner runs offline; optional HTTPS checks and world feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
 
 ## Run
 
@@ -17,7 +17,9 @@ go build -o bin/godseye.exe ./cmd/godseye
 .\bin\godseye.exe serve --root .
 ```
 
-Open `http://127.0.0.1:8765`. The Overview, Assets, Checks and Coverage pages use the real backend. Source scans are restricted to the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint, without crawling or following redirects. The source and web check modules are native code; no external pentesting tools are integrated.
+Open `http://127.0.0.1:8765`. The Overview, Assets, Checks, Coverage and World view pages use the real backend. Source scans are restricted to the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint, without crawling or following redirects. The source and web check modules are native code; no external pentesting tools are integrated.
+
+World view provides an interactive vector globe, live public earthquake/natural-event layers, calculated space-station positions, a central-India aircraft feed, saved browser-local pins and GeoJSON export. It reuses two MIT source helpers from God's Eye View with attribution. It needs no paid API, API key or external map tiles. See [World view sources and limitations](docs/world-view.md) for exact coverage and data-license terms.
 
 Inventory is saved in `.godseye/assets.json`. Check history lasts for the server session, capped at 20 runs. Export results before stopping the server. Do not put credentials in asset names or targets. This local server has no shared-user authentication and must not be exposed through a public reverse proxy.
 
@@ -50,6 +52,7 @@ On Linux/macOS, build with `go build -o bin/godseye ./cmd/godseye` and run `./bi
 - Source locations, fingerprints independent of line numbers, redacted evidence, and explicit incomplete-scan status.
 - Canonical Protobuf JSON findings inside a scan envelope and SARIF 2.1.0 reports.
 - Offline operation, root-confined file opens, symlink exclusion, and report files created without overwriting existing files.
+- A separate keyless World view with public-source geographic records, browser-local annotations and attributed source-code reuse.
 
 The default limits are 10,000 files, 1 MiB per file, a 64 MiB input reservation budget, 1,000 findings and 30 seconds. `scan --help` lists the controls. The budget reserves each discovered file's size plus one byte for growth detection. Files that grow beyond that reservation are omitted with an explicit coverage gap.
 
@@ -71,6 +74,8 @@ go vet ./...
 go test -race ./...
 ```
 
+Frontend checks run with `npm test` and `npm run build` inside `apps/web/`.
+
 With the dashboard running, `pwsh -File scripts/smoke.ps1` exercises the real local API, synthetic detection, exports, cancellation, limits and overwrite protection. Add `-Website https://your-authorized-domain/` only when you want to check that explicitly authorized public HTTPS endpoint. See [live verification results](docs/live-verification-2026-10-16.md) for the recorded domain and local tests.
 
 The race detector requires a supported C compiler on Windows. Protobuf bindings were generated using `protoc-gen-go v1.36.10` and the compiler bundled with `grpcio-tools 1.84.0`. See the generation header for the compiler version. Generate with `--go_out=. --go_opt=module=godseye` and `api/` as the source include root.
@@ -82,5 +87,6 @@ The race detector requires a supported C compiler on Windows. Protobuf bindings 
 - [Verification results and first scan benchmark](docs/verification.md)
 - [Asset coverage, native capability plan and operating systems](docs/platform-scope.md)
 - [God's Eye View repository review](docs/reference-review.md)
+- [World view functionality, sources and attribution](docs/world-view.md)
 
 The architecture separates live proxy/VPN traffic from audit workers. It does not promise universal anonymity or claim measured network performance.
