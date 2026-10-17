@@ -17,6 +17,7 @@ import (
 	"godseye/internal/report"
 	"godseye/internal/secrets"
 	"godseye/internal/webcheck"
+	"godseye/internal/world"
 )
 
 type Finding struct {
@@ -52,6 +53,7 @@ type Server struct {
 	assets  []Asset
 	runs    []*Run
 	context context.Context
+	world   *world.Service
 }
 
 func New(ctx context.Context, root, stateDir string) (*Server, error) {
@@ -72,12 +74,20 @@ func New(ctx context.Context, root, stateDir string) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx}, nil
+	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx, world: world.New(filepath.Join(stateDir, "world-cache"))}, nil
 }
 
 func (s *Server) Handler(host, dist string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/state", s.state)
+	mux.HandleFunc("GET /api/world/{layer}", func(w http.ResponseWriter, r *http.Request) {
+		snapshot, ok := s.world.Snapshot(r.Context(), r.PathValue("layer"))
+		if !ok {
+			fail(w, 404, "Unknown public data layer")
+			return
+		}
+		send(w, 200, snapshot)
+	})
 	mux.HandleFunc("POST /api/assets", s.addAsset)
 	mux.HandleFunc("DELETE /api/assets/{id}", s.removeAsset)
 	mux.HandleFunc("POST /api/runs", s.startRun)
