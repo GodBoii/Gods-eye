@@ -1,0 +1,64 @@
+/* Shared black edition. Geometry stays quiet; data carries the hierarchy. */
+:root { --bg:#000; --surface:#090909; --raised:#121212; --text:#eee; --muted:#aaa; --line:#292929; --accent:#d6eea0; --danger:#efa698; background:#000; font-family:'Segoe UI',Arial,sans-serif; font-variant-numeric:tabular-nums; }
+body { background:#000; }
+button,.button { border-radius:3px; border-color:#333; background:#121212; font-weight:500; transition:background 160ms,border-color 160ms,color 160ms,transform 160ms; }
+button:hover,.button:hover { background:#1e1e1e; border-color:#666; }
+button:active,.button:active { transform:translateY(1px); }
+.primary { background:#d6eea0; border-color:#d6eea0; color:#151a0c; }
+.primary:hover { background:#e1f2bf; border-color:#e1f2bf; }
+input:not([type='checkbox']),select { background:#060606; border-color:#383838; border-radius:3px; }
+input::placeholder { color:#888; }
+.sidebar { background:#060606; padding-top:27px; }
+.brand { font-size:15px; gap:10px; }
+.brand-symbol { font-size:30px; }
+.workspace-tag { background:transparent; border:0; border-bottom:1px solid #292929; border-radius:0; padding-left:8px; color:#aaa; }
+.nav-heading { color:#888; font-size:8px; }
+nav button { color:#aaa; font-size:12px; }
+nav button.nav-active { color:#d6eea0; background:#15180f; border-color:#343c23; }
+nav button.nav-active:before { display:none; }
+.nav-number { font-size:9px; opacity:.5; }
+.sidebar-note { display:none; }
+.sidebar-bottom { margin-top:auto; color:#aaa; }
+.sidebar-bottom small { color:#888; }
+.topbar { height:72px; color:#999; }
+.local-chip { border:0; background:transparent; color:#aab493; }
+.page-heading { margin-top:4px; }
+h1 { font-weight:400; letter-spacing:-1.3px; font-size:clamp(27px,3vw,40px); }
+.page-heading p { font-size:12px; color:#999; margin-top:12px; }
+.build-label { display:none; }
+.metrics { background:#060606; border-radius:0; border-width:1px 0; }
+.metrics span { color:#aaa; }
+.metrics strong { font-size:38px; font-weight:350; margin:13px 0; }
+.metrics small { color:#888; line-height:1.6; }
+.panel { border-radius:3px; padding:25px; background:#090909; }
+.scope-note { background:#111; border-left:1px solid #69794c; }
+label { color:#bbb; }
+.scope-note > span { color:#999; }
+.scope-note code { color:#ccc; }
+.checkbox { color:#aaa; }
+.coverage-row,.asset-row,.run-row { background:transparent; }
+.badge { border-radius:2px; }
+.main-footer { color:#888; }
+.status-dot { background:#d6eea0; }
+.earth-entry { display:grid; grid-template-columns:1.2fr 1fr; gap:40px; padding-top:18px; }
+.earth-entry-intro h2 { font-size:clamp(32px,4vw,54px); line-height:1.12; letter-spacing:-2px; font-weight:400; margin:25px 0; }
+.earth-entry-intro p { max-width:480px; color:#aaa; font-size:13px; margin-bottom:24px; }
+.earth-entry-intro .button { gap:30px; padding:13px 20px; }
+.earth-entry-intro small { display:block; font-size:10px; color:#999; line-height:1.7; margin-top:16px; }
+.earth-entry-orbit { position:relative; min-height:330px; display:grid; place-content:center; overflow:hidden; }
+.earth-entry-orbit div { width:220px; height:220px; border:1px solid #454c39; border-radius:50%; background:radial-gradient(circle at 32% 26%,#20271a,#080a06 65%,#000 76%); box-shadow:0 0 0 25px #141610,0 0 0 26px #252a1c,0 0 0 65px #060704,0 0 0 66px #171a11; transform:rotate(-25deg) scaleX(.85); }
+.earth-entry-orbit span { position:absolute; top:65px; right:47%; color:#d6eea0; font-size:18px; }
+.earth-entry-orbit small { position:absolute; bottom:10px; width:100%; text-align:center; font:8px Consolas,monospace; letter-spacing:2px; color:#999; }
+.earth-entry-features { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid #333; margin-top:15px; }
+.earth-entry-features article { padding:25px 24px 0 0; }
+.earth-entry-features article > span { color:#888; font:10px Consolas,monospace; }
+.earth-entry-features h3 { font-size:17px; font-weight:450; margin:14px 0; }
+.earth-entry-features p { color:#999; font-size:12px; }
+.earth-entry-note { grid-column:1/-1; color:#888; font-size:11px; max-width:800px; }
+.world-globe { background:#000; }
+.world-land { fill:#242923; stroke:#889180; }
+.world-grid { stroke:#ffffff12; }
+.world-layer-status { color:#bbb; }
+.world-atmosphere { stroke:#4e5946; fill:none; }
+@media(max-width:800px) { .earth-entry { grid-template-columns:1fr; gap:20px; } .earth-entry-orbit { display:none; } .earth-entry-features { grid-template-columns:1fr; } .earth-entry-features article { border-bottom:1px solid #292929; padding-bottom:22px; } .sidebar-bottom { display:none; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; } }
