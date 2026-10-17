@@ -39,6 +39,7 @@ type Run struct {
 	FinishedAt   *time.Time       `json:"finishedAt"`
 	Files        int              `json:"files"`
 	FindingCount int              `json:"findingCount"`
+	ReviewCount  int              `json:"reviewCount"`
 	Findings     []Finding        `json:"findings"`
 	Checks       []webcheck.Check `json:"checks"`
 	Gaps         []string         `json:"gaps"`
@@ -86,6 +87,10 @@ func New(ctx context.Context, root, stateDir string) (*Server, error) {
 func (s *Server) Handler(host, dist string) http.Handler {
 	mux := http.NewServeMux()
 	s.registerWorkbench(mux)
+	s.registerToolAssessments(mux)
+	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
+		send(w, 200, map[string]any{"service": "godseye", "version": "0.4.0", "capabilities": []string{"workbench-v1", "tool-assessments-v1"}})
+	})
 	mux.HandleFunc("GET /api/state", s.state)
 	mux.HandleFunc("GET /api/world/{layer}", func(w http.ResponseWriter, r *http.Request) {
 		snapshot, ok := s.world.Snapshot(r.Context(), r.PathValue("layer"))
@@ -339,6 +344,11 @@ func (s *Server) execute(ctx context.Context, run *Run, target string) {
 	run.Findings = completed.Findings
 	run.FindingCount = len(completed.Findings)
 	run.Checks = completed.Checks
+	for _, check := range completed.Checks {
+		if check.Status == "review" {
+			run.ReviewCount++
+		}
+	}
 	run.Gaps = completed.Gaps
 	run.Error = completed.Error
 	run.jsonReport = completed.jsonReport
