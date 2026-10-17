@@ -3,7 +3,7 @@ import { readResponseJsonCapped } from './providers/common/http.js';
 import { blockedApi } from '../src/free/policy.js';
 
 /** Fixed upstream hosts, bounded cache and coalesced requests. No credentials. */
-export function freeEditionGateway() {
+export function freeEditionGateway({ fetchImpl = (...args) => fetch(...args) } = {}) {
   const cache = new Map();
   const pending = new Map();
   const install = (server) => { server.middlewares.use(async (req, res, next) => {
@@ -30,7 +30,10 @@ export function freeEditionGateway() {
       if (!pending.has(key)) {
         const request = (async () => {
           const signal = AbortSignal.timeout(12000);
-          const response = await fetch(`https://api.adsb.lol/v2/point/${key}/250`, { signal });
+          const response = await fetchImpl(`https://api.adsb.lol/v2/point/${key}/250`, {
+            signal,
+            headers: { 'User-Agent': 'godseye-keyless/1.0 (+https://github.com/bilawalsidhu/gods-eye-view)', Accept: 'application/json' },
+          });
           if (!response.ok) { void response.body?.cancel(); throw new Error(`Aircraft provider returned ${response.status}`); }
           const payload = await readResponseJsonCapped(response, 8 * 1024 * 1024, signal);
           if (!payload || !Array.isArray(payload.ac)) throw new Error('Malformed aircraft feed');
