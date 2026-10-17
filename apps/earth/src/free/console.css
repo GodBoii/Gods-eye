@@ -126,6 +126,10 @@
 .free-edition :is(.pp-toggle-btn,.scene-btn,.panel-header,.panel-title) { text-shadow:none !important; box-shadow:none !important; letter-spacing:.3px; }
 .free-edition .pp-toggle-btn { border-radius:3px; background:#131313; border-color:#333; color:#aaa; }
 .free-edition .pp-toggle-btn.active { color:#d6eea0; border-color:#626e49; background:#171b11; }
+.free-edition #pp-toggles :is(.pp-toggle-btn.active,.pp-mode-btn.active) { color:#d6eea0 !important; border-color:#424a33 !important; background:#15180f !important; box-shadow:none !important; }
+.free-edition #pp-toggles .pp-toggle-btn { min-height:40px; }
+.free-edition #pp-toggles .pp-panel-body { scrollbar-width:thin; scrollbar-color:#454545 #0a0a0a; }
+.free-edition .panel-divider { background:#333 !important; box-shadow:none !important; }
 @media(min-width:1100px) { .free-console { animation:free-enter 400ms ease-out both; } }
 @keyframes free-enter { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
 @media(max-width:1100px) { .free-header { gap:20px; } .free-header nav { display:none; } .free-keyless { display:none; } .free-map-actions { top:145px; right:20px; } .free-quick-jumps { flex-wrap:wrap; max-width:280px; } .free-map-bottom { flex-wrap:wrap; } .free-map-bottom label { flex:1 0 100%; margin-bottom:3px; } .free-scale { bottom:133px; } .free-notice { bottom:153px; } }
