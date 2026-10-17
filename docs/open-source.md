@@ -15,3 +15,5 @@ Semgrep's engine is LGPL-2.1, but Semgrep-maintained registry rules have a separ
 Planned Envoy, WireGuard, OpenTelemetry, OSV, Checkov and other adapters remain unimplemented. Their names in the architecture do not mean they have been bundled or audited. Distribution checks must include transitive dependencies, data licenses, optional components and the obligations of the exact selected versions.
 
 Free software does not make hosting, bandwidth or third-party infrastructure free. The current CLI runs on the user's own computer without paid services.
+
+The security workbench adapts two Apache-2.0 CyberChef helper algorithms and includes nine MIT Sherlock URL templates. Pinned commit IDs, original copyright statements, modifications and full license files are recorded in source headers, NOTICE, `licenses/cyberchef.txt`, `licenses/sherlock.txt` and the [workbench guide](tool-workbench.md). Nuclei, BBOT and CloudFox clones were reviewed for report formats; their engines and rule packs are not shipped. The new parsers, network/file analysis and IAM review use the existing Go standard library without adding runtime dependencies.
