@@ -2,9 +2,11 @@
 
 The platform organizes source repositories, deployed websites, APIs, backend services, applications, databases, cloud resources, containers and networks. An inventory entry records scope; it is not evidence that an asset has been assessed. Access to private data or authenticated services requires explicit credentials and authorization in a future connector. No system can collect or assess all internet data.
 
-## Available in 0.2
+## Available in 0.3
 
 The React dashboard runs on the local Go server. You can register assets, filter the inventory, prepare a check, confirm the authorized target, run or cancel a check, inspect results and export reports. Inventory persists in `.godseye/assets.json`; the last 20 check results remain in memory for the server session. Export reports before stopping the server.
+
+The separate [World view](world-view.md) adds a keyless vector globe, USGS earthquakes, NASA natural events, calculated CelesTrak station positions, a regional ADSB.lol aircraft layer, browser-local pins and GeoJSON export. It reuses two attributed MIT helpers from the God's Eye View reference repository. These geographic layers do not assess the security of registered assets.
 
 Source checks use the existing three credential-pattern rules. Website, API, backend and application checks issue a single HEAD request to an explicit public HTTPS endpoint on port 443. They verify the TLS connection normally, report certificate expiry, and inspect selected response headers. Presence is distinguished from effective policy. Redirects are not followed, response bodies are not collected, and private/local/reserved destinations are rejected after DNS resolution. There is no crawler, injection tester or authentication bypass.
 
