@@ -14,30 +14,32 @@ Other asset categories support inventory only. The UI shows that limitation. The
 
 The source checker confines targets to the workspace configured with `serve --root`. The UI cannot request an arbitrary directory outside that workspace. Scan exclusions include `.godseye` and `dist`, in addition to the existing generated/dependency directories. The root is still a live checkout, not an immutable snapshot.
 
+The security workbench now adds report imports, TCP/DNS diagnostics, offline PCAP/file analysis, static AWS IAM policy review, local data recipes and evidence graphs. Its normalized reports persist separately in `<state>/evidence/`, retaining the newest 20. These workflows do not automatically assess an inventory entry. Use Workbench to select the appropriate input or explicit network target. Its black theme is scoped out of World view and Earth console.
+
 ## Operating systems
 
 Windows is supported for the current local CLI and dashboard. Ubuntu LTS is the intended first Linux server target because predictable maintenance is useful for production collectors. Arch is optional, not a prerequisite for defensive security work. Kernel-level telemetry and network routing will require separately tested Linux components and appropriate privileges. Neither a distribution nor a collection of pentesting tools automatically makes the platform secure.
 
 ## Tool-list interpretation
 
-The user's latest preference is to build native capabilities, without integrating external tools for now. None of the following tools is bundled, launched or copied into this build. This table records capability ideas, not completed replacements or claims of equivalence.
+The [workbench guide](tool-workbench.md) and Tools page now document all 26 requested references. Native subsets and report compatibility are implemented. External scanner engines and commercial product code are not bundled or launched. Two CyberChef algorithms and nine Sherlock URL templates are reused with pinned provenance and full license notices.
 
-| Reference tools | Native capability to consider | Status |
+| Reference tools | Available capability | Remaining scope |
 | --- | --- | --- |
-| Nmap, hping3, netcat | Scoped service inventory, connectivity and protocol diagnostics | Planned; no port sweep or packet generation |
-| Wireshark | Offline packet-file analysis and protocol summaries | Planned; no packet capture |
-| Metasploit | Reproducible verification of selected findings in isolated test environments | Planned; no exploit runner |
-| Aircrack-ng, “airgorha” | Wireless configuration and capture review | Planned; “airgorha” is unidentified, possibly a different wireless project |
-| Hashcat | Password-policy and authorized offline hash assessment | Planned; no credential-cracking engine |
-| Skipfish, sqlmap, Nuclei | Website/API checks with bounded rules and evidence | HTTPS headers/TLS only today; no injection or exploitation |
-| Foremost | File-type identification and authorized offline recovery | Planned |
-| Shodan, “spiderdomain”, passive reconnaissance | Public asset discovery with provenance and explicit domain scope | Planned; “spiderdomain” is not an identified repository |
-| Maltego, SpiderFoot, Sherlock, recon-ng, BBOT | Evidence-backed asset relationships, public-source enrichment and entity resolution | Planned; no personal-profile collection or mass harvesting |
-| CloudFox | Read-only cloud inventory and permission analysis | Planned; requires scoped provider access |
-| Evilginx3 | Session-security assessment using controlled test fixtures | No reverse-proxy credential or session-token capture implemented |
-| Caido, Burp Suite | Request/response inspection and API test workspaces | Planned; no intercepting proxy or certificate installation |
-| BloodHound | Permission and identity relationship graphs | Planned; requires authorized directory data |
-| CyberChef | Local encoding, hashing, parsing and data inspection | Planned |
+| Nmap, hping3, netcat | Native TCP diagnostics; Nmap service XML import | No raw packets, OS fingerprinting, NSE, shell listeners or scanner engine |
+| Wireshark | Classic Ethernet PCAP conversation metadata and TShark JSON | No live capture, PCAPNG, dissectors or reassembly |
+| Metasploit | Database XML host/service/vulnerability labels | No exploits, payloads, sessions, credentials or loot |
+| Aircrack-ng, Airgorah | Airodump access-point CSV and OPN/WEP review | No radio operations, deauthentication or cracking; Airgorah is the likely intended spelling |
+| Hashcat | Hash-format hints and local digest operations | No password-cracking engine |
+| Skipfish, sqlmap, Nuclei | HTTPS checks, sqlmap CSV and Nuclei JSON/JSONL evidence | No Skipfish parser, crawler, injection or template execution |
+| Foremost | Native file identification and PNG/JPEG/PDF/ZIP recovery candidates | No upstream Foremost code or filesystem recovery |
+| Shodan, spiderdomain, passive reconnaissance | Shodan export import; native DNS/mail-policy review | No live Shodan account or hosted index; spiderdomain remains unidentified |
+| Maltego, SpiderFoot, Sherlock, recon-ng, BBOT | Evidence graphs, infrastructure report imports and manual profile links | No commercial transforms, recursive execution or automated personal-profile harvesting |
+| CloudFox | Resource/endpoint CSV and static IAM policy review | No live cloud collection or effective-permission simulation |
+| Evilginx3 | Excluded | No phishing proxy or credential/session capture |
+| Caido, Burp Suite | Generic HAR inspection and Burp issue XML | No native Caido project import, proxy, replay or scanner engine |
+| BloodHound | Collection JSON ACL/membership edges and delegation review | No collector, ZIP/OpenGraph import or attack-path search |
+| CyberChef | Eighteen local recipe operations, two adapted helpers | No full engine or encryption suite |
 
 The named tools solve different problems and represent substantial engineering work. Their capabilities should be delivered in tested modules, not represented by nonfunctional buttons or copied branding. Native code should use documented protocols and original tests. Any future source reuse needs exact-version license review and attribution.
 
@@ -47,10 +49,10 @@ The named tools solve different problems and represent substantial engineering w
 
 ## Next implementation modules
 
-1. Durable check history, asset-linked evidence, schema migrations and retention controls.
+1. Durable source/HTTPS check history, asset-linked evidence and schema migrations. Workbench evidence already persists with a 20-report retention limit.
 2. Native dependency inventory, SBOM output and advisory lookups with an offline mode.
 3. API schema import and endpoint coverage, then bounded authenticated checks using explicit credential storage.
 4. IaC analysis, runtime observations and a graph linking deployments, services and findings.
-5. Native diagnostic utilities and isolated verification workflows, selected by actual project needs.
+5. Broader diagnostic coverage and isolated verification workflows, selected by actual project needs.
 
 Proxy, VPN, privileged collection and broad reconnaissance remain separate workstreams. The dashboard architecture leaves room for them without claiming they exist.
