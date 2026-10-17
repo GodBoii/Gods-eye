@@ -21,11 +21,13 @@ go build -o bin/godseye.exe ./cmd/godseye
 .\bin\godseye.exe serve --root .
 ```
 
-Open `http://127.0.0.1:8765`. The Overview, Assets, Checks, Coverage and World view pages use the real backend. Source scans are restricted to the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint, without crawling or following redirects. The source and web check modules are native code; no external pentesting tools are integrated.
+Open `http://127.0.0.1:8765`. Workbench provides report imports, TCP/DNS diagnostics, offline PCAP and file analysis, IAM policy review, local data recipes and evidence graphs. Tools lists the exact coverage and limits for all 26 requested reference tools. External scanner engines are not bundled or launched. See the [workbench guide](docs/tool-workbench.md) for supported formats, source reuse and CLI commands.
+
+Overview, Assets and Checks retain the existing source and HTTPS workflows. Source scans stay inside the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint without crawling or following redirects. The security pages use a minimal black theme; World view and Earth console retain their separate presentation.
 
 World view provides an interactive vector globe, live public earthquake/natural-event layers, calculated space-station positions, a central-India aircraft feed, saved browser-local pins and GeoJSON export. It reuses two MIT source helpers from God's Eye View with attribution. It needs no paid API, API key or external map tiles. See [World view sources and limitations](docs/world-view.md) for exact coverage and data-license terms.
 
-Inventory is saved in `.godseye/assets.json`. Check history lasts for the server session, capped at 20 runs. Export results before stopping the server. Do not put credentials in asset names or targets. This local server has no shared-user authentication and must not be exposed through a public reverse proxy.
+Inventory is saved in `.godseye/assets.json`. Source/HTTPS check history lasts for the server session, capped at 20 runs. Workbench evidence persists in `.godseye/evidence/`, retaining the newest 20 normalized reports. Raw uploads are not saved. Export important reports before retention removes older evidence. Do not put credentials in asset names or targets. This local server has no shared-user authentication and must not be exposed through a public reverse proxy.
 
 Use `--port`, `--web` and `--state` to change the port, built-frontend directory and inventory directory. The default paths are relative to the launch directory. `npm run dev` is a frontend-only development server; use the Go-served production build for a fully connected dashboard.
 
@@ -57,12 +59,14 @@ On Linux/macOS, build with `go build -o bin/godseye ./cmd/godseye` and run `./bi
 - Canonical Protobuf JSON findings inside a scan envelope and SARIF 2.1.0 reports.
 - Offline operation, root-confined file opens, symlink exclusion, and report files created without overwriting existing files.
 - A separate keyless World view with public-source geographic records, browser-local annotations and attributed source-code reuse.
+- A security workbench with 14 report import formats, scoped TCP/DNS diagnostics, classic Ethernet PCAP metadata, file recovery candidates, static AWS IAM review, durable normalized evidence and per-report relationship graphs.
+- Eighteen browser-local recipe operations using two attributed CyberChef helpers, plus nine Sherlock URL templates for manual profile review. These are explicit subsets, not full replacements for those products.
 
 The default limits are 10,000 files, 1 MiB per file, a 64 MiB input reservation budget, 1,000 findings and 30 seconds. `scan --help` lists the controls. The budget reserves each discovered file's size plus one byte for growth detection. Files that grow beyond that reservation are omitted with an explicit coverage gap.
 
 ## Coverage and limits
 
-This is an early implementation, not the completed platform. The local dashboard server supports one active check at a time. It has no durable job queue, external plugin execution, gRPC server, SAST data-flow analysis, dependency auditing, runtime collection, VPN or proxy deployment yet. The generated schema does not mean all protocol validation and lifecycle behaviors are implemented.
+This is an early implementation, not the completed platform. The local dashboard supports one source/HTTPS check and up to two bounded workbench operations at a time. It has no durable job queue, external plugin execution, gRPC server, SAST data-flow analysis, dependency auditing, runtime collection, VPN or proxy deployment yet. Workbench report persistence does not persist the source/HTTPS run history. The generated schema does not mean all protocol validation and lifecycle behaviors are implemented.
 
 Only UTF-8 text is inspected. Binary/non-UTF-8 content, unreadable or oversized files, and exhausted limits mark a scan incomplete. The directories `.git`, `node_modules`, `vendor`, `.venv`, `bin`, `reports`, `.godseye` and `dist` are policy exclusions and their counts are reported. Symlinks and special files are excluded. Git history, archives and `.gitignore` semantics are not implemented. Other hidden files, including `.env`, are scanned.
 
@@ -92,5 +96,6 @@ The race detector requires a supported C compiler on Windows. Protobuf bindings 
 - [Asset coverage, native capability plan and operating systems](docs/platform-scope.md)
 - [God's Eye View repository review](docs/reference-review.md)
 - [World view functionality, sources and attribution](docs/world-view.md)
+- [Security workbench, 26-tool coverage and source reuse](docs/tool-workbench.md)
 
 The architecture separates live proxy/VPN traffic from audit workers. It does not promise universal anonymity or claim measured network performance.
