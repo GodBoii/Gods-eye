@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
-    "test": "tsx --test src/world/*.test.ts"
+    "test": "tsx --test src/world/*.test.ts src/lab/*.test.ts"
   },
   "dependencies": {
     "d3-geo": "3.1.1",
