@@ -242,7 +242,7 @@ export function mountFreeConsole(application) {
           } catch (error) { if (!request.signal.aborted) content.replaceChildren(element('p', '', error.message)); }
           break;
         }
-        case 'tools': { const open = document.body.classList.toggle('free-tools'); document.body.classList.remove('free-details'); find('[data-action="details"]').setAttribute('aria-pressed', 'false'); action.setAttribute('aria-pressed', String(open)); break; }
+        case 'tools': { const open = document.body.classList.toggle('free-tools'); if (open) document.getElementById('pp-toggles').classList.remove('collapsed'); document.body.classList.remove('free-details'); find('[data-action="details"]').setAttribute('aria-pressed', 'false'); action.setAttribute('aria-pressed', String(open)); break; }
         case 'details': { const open = document.body.classList.toggle('free-details'); document.body.classList.remove('free-tools'); find('[data-action="tools"]').setAttribute('aria-pressed', 'false'); action.setAttribute('aria-pressed', String(open)); break; }
         case 'focus': { const open = document.body.classList.toggle('free-focus'); action.setAttribute('aria-pressed', String(open)); break; }
         case 'sun': viewer.scene.globe.enableLighting = !viewer.scene.globe.enableLighting; action.setAttribute('aria-pressed', String(viewer.scene.globe.enableLighting)); viewer.scene.requestRender(); break;
