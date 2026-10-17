@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { blockedApi, layerAllowed } from './policy.js';
+import { blockedApi, layerAllowed, clearProviderCredentials } from './policy.js';
 import { parseWorkspace, readWorkspace, saveWorkspace, workspaceGeoJSON } from './workspace.js';
 
 const view = { id: 'view-1', name: 'India', position: [1, 2, 3], heading: 0, pitch: -1, roll: 0, layers: ['earthquakes'] };
@@ -31,4 +31,9 @@ test('billing routes are blocked while free feeds and static files pass', () => 
   for (const path of ['/api/flights', '/api/celestrak', '/api/weather', '/logo.svg']) assert.equal(blockedApi(path), false, path);
   assert.equal(layerAllowed('traffic'), false);
   assert.equal(layerAllowed('earthquakes'), true);
+});
+test('ambient credentials cannot activate optional billed fallbacks', () => {
+  const environment = { GOOGLE_MAPS_API_KEY: 'fixture', GOOGLE_MAPS_SERVER_API_KEY: 'fixture', OPENAI_API_KEY: 'fixture', LL2_API_TOKEN: 'fixture', TFL_APP_KEY: 'fixture', PORT: '4173', PATH: '/usr/bin' };
+  clearProviderCredentials(environment);
+  assert.deepEqual(environment, { PORT: '4173', PATH: '/usr/bin' });
 });
