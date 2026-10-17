@@ -1,5 +1,15 @@
 # Initial CLI verification
 
+## World view verification, 0.3
+
+Verified on 2026-10-17. All backend tests and `go vet ./...` pass, including the new feed-cache coalescing, disk-cache restart, stale/cooldown, invalid/oversized payload and redirect checks. Six frontend tests pass for attributed source helpers, geospatial bounds, orbit propagation, aircraft freshness, pin validation and GeoJSON attribution. TypeScript checking and the production build pass; the separate World view JavaScript chunk is about 64 kB before gzip and loads on demand. The production npm audit reported zero known vulnerabilities at verification time.
+
+Live USGS, NASA EONET, CelesTrak and ADSB.lol requests succeeded without an API key. One browser load showed 53 earthquakes, 54 natural events, 17 station calculations and 17 aircraft reports; subsequent counts changed as the feeds updated. All count claims are point-in-time observations.
+
+Browser checks verified nonblank geographic rendering, layer toggles, map pan/zoom controls, keyboard rotation, coordinate/preset navigation, record filtering, pin creation and reload persistence, and a GeoJSON download containing source attribution. A downloaded snapshot contained 142 features spanning all four feed layers and one clearly labeled demo pin. Browser console inspection showed no warnings or errors. Layouts were inspected at 390px mobile and desktop sizes; no document-level horizontal overflow occurred on mobile. API credentials, paid provider requests and third-party tile requests are absent from this section.
+
+The local CLI/dashboard smoke script was rerun and all 12 checks passed, including scanning, redaction, cancellation, limits, report preservation and inventory cleanup. Layer toggles were also checked while feed requests completed, with reserved layout space to avoid moving controls. Linux cross-build passes; Linux runtime and the race detector remain unverified. See [World view](world-view.md) for provider limits and omitted reference-repository features.
+
 ## Dashboard verification, 0.2
 
 The Go dashboard API tests cover inventory persistence, workspace traversal rejection, authorization acknowledgement, unknown JSON fields, Host/Origin and custom-header protections, scan admission, cancellation propagation, the full scan/report lifecycle, redaction, and compact summary responses. Native HTTPS checker tests cover private/reserved address rejection, invalid URLs and cautious header-policy interpretation. `go test ./...` and `go vet ./...` pass.
