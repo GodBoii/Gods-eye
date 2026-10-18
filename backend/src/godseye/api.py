@@ -14,6 +14,7 @@ from starlette.staticfiles import StaticFiles
 
 from godseye import __version__
 from godseye.application import Application, RunConflict
+from godseye.build import identity
 from godseye.config import Settings
 from godseye.contracts import AssetRequest, InvalidRequest, RunRequest, decode_request
 from godseye.middleware import LocalBoundary
@@ -38,6 +39,7 @@ def create_app(settings: Settings) -> FastAPI:
         with InstanceLock(configuration.state):
             application = Application(configuration)
             app.state.application = application
+            app.state.build_id = identity()
             try:
                 yield
             finally:
@@ -59,13 +61,14 @@ def create_app(settings: Settings) -> FastAPI:
         return JSONResponse({"error": str(error)}, 400)
 
     @app.api_route("/api/health", methods=["GET", "HEAD"])
-    async def health() -> dict[str, Any]:
+    async def health(request: Request) -> dict[str, Any]:
         return {
             "service": "godseye",
             "version": __version__,
             "runtime": "python",
-            "migrationStage": "source-and-inventory",
-            "capabilities": ["inventory-v1", "source-scans-v1"],
+            "build": request.app.state.build_id,
+            "migrationStage": "source-https-and-inventory",
+            "capabilities": ["inventory-v1", "source-scans-v1", "https-checks-v1"],
         }
 
     @app.api_route("/api/state", methods=["GET", "HEAD"])
