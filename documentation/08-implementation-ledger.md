@@ -1,0 +1,112 @@
+# Python implementation ledger
+
+Updated 18 October 2026. The migration has started. The default application remains on Go while the Python candidate implements inventory and source scanning. Go removal and full cutover have not happened.
+
+## Baseline and isolation
+
+Implementation starts at `9482391`, after the planning commits. `git diff --exit-code 4d27de83ad087703b197432ccbf2870a5ea6164c 9482391 -- cmd internal api apps` passed, confirming no application-source drift from the planned baseline. The working tree was clean before implementation.
+
+The baseline was rebuilt as ignored `bin/godseye-go-baseline.exe`, using Go 1.27.2 on Windows. Its SHA256 is `df85bffbbdd867ab10e4891e7431ae8f8c0045cccf916e58e3d4f43ac2096399`; it reports version 0.4.0. Git retains the release source and the existing built executables remain untouched.
+
+Existing Go installations on ports 8766 and 8767 use distinct state directories. They were inspected by process path and command line and left running. Python was started on port 8876 with `.godseye/python-preview`, separate from those installations and the root inventory/evidence. Automated tests use temporary synthetic workspaces and stores, including separate copies for bidirectional inventory compatibility. No live state was pruned or rewritten.
+
+The effective catalog was captured with `bin/godseye-go-baseline.exe lab catalog` in `backend/tests/fixtures/go-v0.4/catalog.json`. It records all 26 tool descriptions, 26 assessments and 14 formats. Installed Nmap was unavailable. Catalog capture does not count as Python implementation.
+
+## Implemented candidate
+
+- Installable Python 3.13 package, module/console entry, typed configuration and universal hash-locked runtime/development dependencies.
+- FastAPI application lifecycle, disabled interactive docs, exact Host/Origin/fetch-site/mutation-header guards and legacy security response headers.
+- Bounded JSON request envelopes with unknown-field/type rejection, Go-compatible missing/null scalar defaults and case-insensitive field names. Validation errors omit input values.
+- Compatible inventory storage with UTF-8 byte limits, 200-asset limit, atomic replacement and publish-after-save semantics. An OS-owned lock excludes other Python writers.
+- All three source patterns, exact ruleset/fingerprint hash framing, source locations, redaction, bounded workers/reads/reservations, exclusions and partial-coverage reporting.
+- Python Protobuf bindings and type stubs generated from the unchanged schema with grpcio-tools 1.84.0. Canonical ProtoJSON preserves enums, uint64 strings, optional fields and oneofs.
+- Source JSON/SARIF exports and scan CLI exit codes, exclusive output files and Go duration units.
+- Dashboard source job admission, status polling, cancellation, retention and downloads. A spawned Python child owns scanner computation; the parent awaits cleanup before releasing admission.
+- A separate Windows preview launcher with a Python runtime/capability check. It cannot replace port 8765 or the root Go state.
+
+Python health advertises `inventory-v1` and `source-scans-v1` only. It deliberately does not advertise `workbench-v1` or `tool-assessments-v1` before their implementations exist. There is no Go subprocess fallback.
+
+## Verification evidence
+
+Reference environment: Windows, Python 3.13.3, Go 1.27.2, Node 22.15.0. Exact Python dependencies and hashes are in `backend/requirements*.lock`. Tests below were executed during implementation, rather than copied from historical reports.
+
+| Requirement | Command or case | Actual result | Scope and remaining gap |
+| --- | --- | --- | --- |
+| Existing backend baseline | Local Go toolchain `go test ./...` and `go vet ./...` | Pass | Existing meaningful tests retained; race detector and Linux runtime not rerun |
+| React dashboard regression | `npm test` and `npm run build` in `apps/web` | 11 pass, build pass | Existing UI code unchanged |
+| Earth free edition regression | `npm run test:free` in `apps/earth` | 26 pass | Initial attempt used a nonexistent `test:free-edition` script, then corrected to the actual script |
+| Python behavior and public-interface parity | `GODSEYE_GO_BASELINE` set, `python -m pytest backend/tests -q` | 91 pass | Includes 10 CLI parity cases and two real-listener parity cases; not all 156 Go test behaviors transferred |
+| Scan JSON/SARIF semantic parity | Clean/candidate/binary/file-count/file-byte fixtures, Unicode paths and HTML/U+2028 hash inputs | Pass | Only random IDs and timestamps normalized; fingerprints, producer digests, arrays, errors and gaps compared exactly |
+| Source scanner limits/privacy | `test_scanner.py`, CLI tests | Pass | Byte/record limits, pre-cancel, UTF-8/binary handling and credential omission; saturated concurrent retention and performance need broader comparison |
+| Root boundary prototype | Real Windows junction rejection, directory rename denial while pinned, child-name rejection, growth omission | Pass | Uses read handles, no reparse following and final-handle path checks before content reads; full adversarial platform matrix remains unverified |
+| CLI and report behavior | `test_cli_parity.py` | Pass | 0/1/2/3 exits, Go duration units, flag ordering and no overwrite |
+| Inventory both directions | Go creates copied store, Python reopens/mutates, copied Python store reopens in Go | Pass | Existing IDs and timestamps retained; real user store never used |
+| Atomic failure | Inject failed replace against a real temporary file | Pass | Prior bytes and in-memory assets retained; temporary file removed |
+| State ownership | Separate-process lock exclusion and release on process exit | Pass | Coordinates Python only; isolated state is still mandatory versus Go |
+| HTTP guards and errors | Real Go/Python listeners plus ASGI request tests | Pass | 19 boundary cases, legacy plain-text guard failures, JSON errors and security headers |
+| Job lifetime | Actual spawned scanner, second request 409, immediate cancel, terminal status and readmission | Pass | Child absent before admission release; future installed-engine descendants not implemented |
+| Static/type/format checks | Ruff check/format, strict mypy for Windows and Linux platforms | Pass | Linux type checking is not Linux runtime testing |
+| Schema generation | `python backend/tools/generate_protocol.py --check` | Pass | Compiler is build-only; schema is unchanged |
+| Package integrity | Hash-locked dependency installation and `pip check` | Pass | Native Windows development and fresh runtime environments |
+| Fresh no-Go runtime | New virtual environment, hash-locked runtime dependencies, wheel built from `./backend`, version and synthetic scan from an external temporary directory | Pass | Go absent from PATH; scan exited 1 with one redacted candidate. This proves only the implemented source/inventory subset, not full no-Go release acceptance. |
+| Docker availability | `docker version` | Engine unavailable | Desktop CLI installed; Linux engine pipe absent. No image execution or container claim |
+
+The initial tests caught and fixed Windows stdout encoding and ineffective metadata-only directory pinning. The latter required requesting read access for directory handles. Tests also exposed overly long generated pytest case names for the oversized fixture; those now use short explicit IDs. No failure was reclassified as a pass by dropping required output fields.
+
+## Phase status
+
+| Planned phase | Status |
+| --- | --- |
+| 0. Recoverable baseline | Baseline build, suites, synthetic catalog and CLI/HTTP comparisons implemented. Live-state backup/restore rehearsal and full performance corpus remain open. |
+| 1. Difficult substitutions | Windows filesystem and spawned scanner prototypes implemented. Full Windows/Linux filesystem matrix, DNS pinning, TLS and installed-engine tree cleanup remain open. |
+| 2. Python foundation | Package, boundary middleware, lifecycle and tested request handling implemented. Full subsystem wiring remains open. |
+| 3. Contracts and stores | Protocol and inventory implemented. Evidence normalization/store, World cache and their bidirectional compatibility remain open. |
+| 4. Scanner and reports | Initial scanner/CLI/exporter implemented and compared. Full platform, malformed/growth/saturation and performance acceptance remain open. |
+| 5. Network foundations | Pending |
+| 6. Imports and local analysis | Pending |
+| 7. Assessment modules | Pending, all 26 rows below |
+| 8. Dashboard coordinator/API | Source runs and inventory implemented. HTTPS, lab and assessment groups remain open. |
+| 9. World/Earth | Earth regression suite passes. Python World feeds and full browser verification pending. |
+| 10. Native/Docker packaging | Windows candidate launcher implemented. Full no-Go feature acceptance and Docker pending. |
+| 11. Release validation | Pending |
+| 12. Default cutover | Pending |
+| 13. Go retirement | Pending, explicitly gated by feature parity |
+
+## Assessment transfer checklist
+
+Each module needs its existing behavior tests, Python dispatch, API/CLI access, scope/limit/privacy cases and persisted report reload before acceptance. Every row currently remains unported.
+
+| Module | Python status | Baseline definition |
+| --- | --- | --- |
+| Nmap | Pending | Captured effective capability and original tests |
+| Hashcat | Pending | Captured effective capability and original tests |
+| CyberChef | Pending | Captured effective capability and original tests |
+| CloudFox | Pending | Captured effective capability and original tests |
+| recon-ng | Pending | Captured effective capability and original tests |
+| Sherlock | Pending | Captured effective capability and original tests |
+| SpiderFoot | Pending | Captured effective capability and original tests |
+| BBOT | Pending | Captured effective capability and original tests |
+| Shodan | Pending | Captured effective capability and original tests |
+| Maltego | Pending | Captured effective capability and original tests |
+| BloodHound | Pending | Captured effective capability and original tests |
+| Burp | Pending | Captured effective capability and original tests |
+| Caido | Pending | Captured effective capability and original tests |
+| Metasploit | Pending | Captured effective capability and original tests |
+| Foremost | Pending | Captured effective capability and original tests |
+| Wireshark | Pending | Captured effective capability and original tests |
+| Aircrack | Pending | Captured effective capability and original tests |
+| Airgorah | Pending | Captured effective capability and original tests |
+| hping3 | Pending | Captured effective capability and original tests |
+| Netcat | Pending | Captured effective capability and original tests |
+| spiderdomain | Pending | Captured effective capability and original tests |
+| passive-recon | Pending | Captured effective capability and original tests |
+| sqlmap | Pending | Captured effective capability and original tests |
+| Evilginx defenses | Pending | Captured effective capability and original tests |
+| Nuclei | Pending | Captured effective capability and original tests |
+| Skipfish | Pending | Captured effective capability and original tests |
+
+## Authorized final verification request
+
+The user supplied personal identifiers, a user-owned HTTPS website and an installed desktop app for final functional/security verification. Those values must remain in ignored local artifacts and must not enter test fixtures, commits or public reports. The installed desktop app has been located. Live-user testing is pending the relevant migrated functionality; current unit/parity results must not be presented as that final audit.
+
+Next implementation work is evidence contracts/storage, network policy and HTTPS, followed by imports/local analysis and the individually accepted assessments. The existing working Go release remains the comparison implementation throughout that work. Removing it now would drop supported features.
