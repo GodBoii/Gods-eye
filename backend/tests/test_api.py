@@ -36,7 +36,7 @@ def test_health_truthful_caps_static_and_headers(client: TestClient) -> None:
     health = client.get("/api/health")
     assert health.status_code == 200
     assert health.json()["runtime"] == "python"
-    assert health.json()["capabilities"] == ["inventory-v1", "source-scans-v1"]
+    assert health.json()["capabilities"] == ["inventory-v1", "source-scans-v1", "https-checks-v1"]
     assert client.head("/api/health").content == b""
     assert client.get("/").status_code == 200
     assert client.get("/api/state/").status_code == 404
@@ -163,3 +163,40 @@ def test_state_lock_prevents_second_application(settings: Settings) -> None:
         pass
     with TestClient(create_app(settings), base_url=BASE) as reopened:
         assert reopened.get("/api/state").status_code == 200
+
+
+def test_https_failure_and_json_only_export(client: TestClient) -> None:
+    result = client.post(
+        "/api/runs",
+        headers=MUTATION,
+        json={"target": "https://127.0.0.1", "kind": "website", "authorized": True},
+    )
+    assert result.status_code == 202
+    run_id = result.json()["id"]
+    run = wait_terminal(client, run_id)
+    assert run["status"] == "failed"
+    assert "reserved destinations" in run["error"]
+    assert client.get(f"/api/runs/{run_id}/report?format=json").status_code == 200
+    assert client.get(f"/api/runs/{run_id}/report?format=sarif").status_code == 400
+
+
+def test_https_summary_counts_review_items(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from godseye.inventory import utc_now
+    from godseye.network import Response
+    from godseye.webcheck import evaluate
+
+    async def fixture_response(target: str, kind: str) -> list:
+        return evaluate(Response(200, {}, None), kind, utc_now())
+
+    monkeypatch.setattr("godseye.application.inspect", fixture_response)
+    result = client.post(
+        "/api/runs",
+        headers=MUTATION,
+        json={"target": "https://fixture.invalid", "kind": "website", "authorized": True},
+    )
+    run = wait_terminal(client, result.json()["id"])
+    assert run["status"] == "completed"
+    assert run["reviewCount"] == 3
+    assert client.get("/api/state").json()["runs"][0]["reviewCount"] == 3
