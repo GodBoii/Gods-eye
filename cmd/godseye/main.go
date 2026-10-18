@@ -34,7 +34,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 0
 	}
 	if len(args) == 0 || args[0] != "scan" {
-		fmt.Fprintln(stderr, "Usage: godseye scan [--format json|sarif] [--out FILE] [--project ID] [--timeout 30s] DIRECTORY\n       godseye lab catalog|import|file|pcap|iam|tcp|dns [flags] [FILE]\n       godseye serve [flags]\n       godseye version")
+		fmt.Fprintln(stderr, "Usage: godseye scan [--format json|sarif] [--out FILE] [--project ID] [--timeout 30s] DIRECTORY\n       godseye lab catalog|assess|import|file|pcap|iam|tcp|dns [flags] [FILE]\n       godseye serve [flags]\n       godseye version")
 		return 2
 	}
 	flags := flag.NewFlagSet("scan", flag.ContinueOnError)
