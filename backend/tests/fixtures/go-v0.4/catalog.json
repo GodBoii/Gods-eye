@@ -1,0 +1,598 @@
+{
+  "assessments": [
+    {
+      "id": "nmap",
+      "name": "Nmap",
+      "coverage": "Multi-address TCP, service banners and TLS; optional installed Nmap service detection",
+      "inputHelp": "One hostname or IP and 1 to 32 explicit ports.",
+      "inputKind": "host",
+      "limit": "No UDP, NSE, OS fingerprinting or exploit execution.",
+      "engine": "nmap",
+      "engineAvailable": false
+    },
+    {
+      "id": "wireshark",
+      "name": "Wireshark",
+      "coverage": "Offline classic PCAP and PCAPNG Ethernet conversation analysis",
+      "inputHelp": "Upload classic Ethernet PCAP or PCAPNG with interface declarations and enhanced packet blocks.",
+      "inputKind": "file",
+      "limit": "No live capture, full dissectors, reassembly or decryption.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "metasploit",
+      "name": "Metasploit Framework",
+      "coverage": "Service-correlated vulnerability triage with validated advisory references",
+      "inputHelp": "MetasploitV5 XML evidence file, without a live target.",
+      "inputKind": "file",
+      "limit": "Imported candidates require independent verification; no exploit, payload or session execution.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "aircrack",
+      "name": "Aircrack-ng",
+      "coverage": "Offline 802.11/radiotap beacon security and management-event analysis",
+      "inputHelp": "Upload Airodump CSV or classic wireless PCAP, without a live target.",
+      "inputKind": "file",
+      "limit": "No radio capture, injection, deauthentication generation, cracking or WPA3 enforcement proof.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "hashcat",
+      "name": "Hashcat",
+      "coverage": "Bounded offline verification of supplied password candidates against unsalted digests",
+      "inputHelp": "JSON: {\"algorithm\":\"sha256\",\"hashes\":[\"hex digest\"],\"candidates\":[\"local candidate\"]}. SHA-384/512 also supported; no live target.",
+      "inputKind": "json",
+      "limit": "At most256 hashes,4096 candidates,1million combinations. No Hashcat engine or salted formats; secrets are omitted from reports.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "skipfish",
+      "name": "Skipfish",
+      "coverage": "Bounded same-origin crawling and per-page HTTP/browser configuration review",
+      "inputHelp": "Root HTTP or HTTPS page; visits up to8 pages at depth2, without queries or form submission.",
+      "inputKind": "url",
+      "limit": "No JavaScript execution, authenticated flows, injection probes or Skipfish engine.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "foremost",
+      "name": "Foremost",
+      "coverage": "Structurally checked PNG, GIF, BMP and WAV byte-range recovery",
+      "inputHelp": "Upload bytes containing embedded images/audio. Leave the live target empty.",
+      "inputKind": "file",
+      "limit": "32 artifact maximum; no decompression, disk/deleted-block recovery or full file decoder.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "sqlmap",
+      "name": "sqlmap",
+      "coverage": "Database error disclosure and captured request/error correlation",
+      "inputHelp": "One target URL for a baseline GET, or a HAR file with response content.",
+      "inputKind": "url-or-har",
+      "limit": "No injection probes, SQLMap engine, database extraction or database permission audit.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "hping3",
+      "name": "hping3",
+      "coverage": "Repeated TCP connect stability measurements and latency statistics",
+      "inputHelp": "One hostname or IP, at most8 explicit ports;3 fixed samples per port.",
+      "inputKind": "host",
+      "limit": "No raw packets, spoofing, floods, application payloads or hping engine.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "shodan",
+      "name": "Shodan",
+      "coverage": "Indexed service exposure, CVE assertion, freshness and TLS expiry triage",
+      "inputHelp": "Shodan host/search/service JSON or JSONL. Optional target is one exact IP filter.",
+      "inputKind": "file",
+      "limit": "Offline index evidence only; no live Shodan API, fresh collection or independent vulnerability verification.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "spiderdomain",
+      "name": "Spiderdomain, unresolved name",
+      "coverage": "DNS alias/PTR enrichment and offline DNS zone inventory review",
+      "inputHelp": "One ASCII domain, or JSON {\"origin\":\"example.test\",\"complete\":true,\"records\":[{\"name\":\"@\",\"type\":\"TXT\",\"value\":\"v=spf1 -all\"}]}. Absolute DNS names end in a dot.",
+      "inputKind": "domain-or-json",
+      "limit": "Upstream identity unresolved. No takeover proof, zone transfer, DNSSEC or exhaustive discovery.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "maltego",
+      "name": "Maltego",
+      "coverage": "Cross-report entity correlation, directed paths and relationship provenance",
+      "inputHelp": "JSON {\"reports\":[normalized report objects],\"from\":\"optional node label\",\"to\":\"optional node label\"}. Leave target empty.",
+      "inputKind": "json",
+      "limit": "20 reports and1000 combined nodes/edges; exact entity matches only. No commercial transforms or external collection.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "airgorah",
+      "name": "Airgorah",
+      "coverage": "Wireless snapshot comparison for protection downgrades and AP metadata changes",
+      "inputHelp": "JSON {\"before\":\"Airodump AP CSV text\",\"after\":\"Airodump AP CSV text\"}; leave target empty.",
+      "inputKind": "json",
+      "limit": "1000 records per snapshot. Offline evidence only; no radio operations or impersonation proof.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "netcat",
+      "name": "Netcat",
+      "coverage": "Fixed read-only service protocol probes and bounded response confirmation",
+      "inputHelp": "One hostname/IP and1 to8 ports. Known ports use HTTP HEAD, SMTP EHLO, Redis PING or Memcached version; others read banners.",
+      "inputKind": "host",
+      "limit": "No arbitrary payloads, shell, listeners, relay, TLS negotiation or netcat engine.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "passive-recon",
+      "name": "Passive reconnaissance",
+      "coverage": "Scoped CT evidence, native DNS and verified public TLS SAN collection",
+      "inputHelp": "One authorized ASCII/punycode domain. Optional crt.sh-style JSON array makes the assessment offline.",
+      "inputKind": "domain-or-json",
+      "limit": "No CT API query, brute-force, discovered-host requests or complete asset inventory. Historical names do not prove live services.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "spiderfoot",
+      "name": "SpiderFoot",
+      "coverage": "Scoped infrastructure event correlation, provenance and exposure review",
+      "inputHelp": "Required target domain plus official SpiderFoot JSON event array or Type/Data CSV.",
+      "inputKind": "file",
+      "limit": "1000 imported events. No module execution, personal profiling, independent-source proof or fresh collection.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "sherlock",
+      "name": "Sherlock",
+      "coverage": "Explicit profile-response evidence quality and consistency review",
+      "inputHelp": "JSON {\"username\":\"test\",\"profiles\":[{\"url\":\"https://example.test/test\",\"status\":200,\"title\":\"optional\",\"canonical\":\"optional HTTPS URL\",\"observedAt\":\"RFC3339\"}]}; no live target.",
+      "inputKind": "json",
+      "limit": "32 supplied profiles only. No live enumeration, identity inference or account-existence claims; report values are withheld.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "recon-ng",
+      "name": "recon-ng",
+      "coverage": "Before/after infrastructure inventory reconciliation and source-set comparison",
+      "inputHelp": "JSON {\"domain\":\"example.test\",\"before\":[{\"host\":\"a.example.test\",\"ip_address\":\"192.0.2.1\",\"source\":\"cmdb\"}],\"after\":[]}.",
+      "inputKind": "json",
+      "limit": "1000 combined records; offline snapshots only. Absence is not proof of decommissioning or takeover.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "bbot",
+      "name": "BBOT",
+      "coverage": "Scoped recursive-scan evidence graph, parent provenance and coverage frontier",
+      "inputHelp": "Required target domain plus BBOT infrastructure JSON or JSONL events.",
+      "inputKind": "file",
+      "limit": "1000 supplied events. No live recursive scanning, off-scope collection or ownership proof.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "cloudfox",
+      "name": "CloudFox",
+      "coverage": "CloudFormation S3, RDS, security-group and IAM configuration checks",
+      "inputHelp": "AWS CloudFormation JSON with Resources, or an IAM Statement policy. Leave target empty.",
+      "inputKind": "json",
+      "limit": "Selected static checks only; unresolved intrinsic expressions are unknown. No deployed inventory or effective-permission simulation.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "evilginx3",
+      "name": "Evilginx3",
+      "coverage": "Defensive session-cookie, transport, caching, framing and password-form review",
+      "inputHelp": "One authorized URL for a baseline GET, or a HAR with response headers and optional HTML content.",
+      "inputKind": "url-or-har",
+      "limit": "Defensive assessment only. No phishing proxy, interception, credential collection or MFA bypass; authentication design still needs authenticated review.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "caido",
+      "name": "Caido",
+      "coverage": "Paired HAR comparison and owner-defined expected-denial evidence review",
+      "inputHelp": "JSON {\"baseline\":HAR,\"candidate\":HAR,\"expectDenied\":[\"/optional-path\"]}. Optional target scopes one origin.",
+      "inputKind": "json",
+      "limit": "Offline unambiguous endpoint comparisons only; no interception, replay or confirmed authorization-bypass claims.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "nuclei",
+      "name": "Nuclei",
+      "coverage": "Native HTTP exposure rules for directory listings, debug pages, embedded source maps and cookie configuration",
+      "inputHelp": "Explicit HTTP or HTTPS page to assess.",
+      "inputKind": "url",
+      "limit": "Native rules only; no external template pack or Nuclei engine.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "bloodhound",
+      "name": "BloodHound",
+      "coverage": "Cross-collection directed directory-control path analysis",
+      "inputHelp": "JSON {\"collections\":[BloodHound v5/v6 objects],\"start\":\"exact ObjectIdentifier\",\"end\":\"exact ObjectIdentifier\"}; no live target.",
+      "inputKind": "json",
+      "limit": "20 collections and1000 combined records. Selected membership/ACL paths only; no collector, exploit execution or effective-access proof.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "cyberchef",
+      "name": "CyberChef",
+      "coverage": "JWT policy/lifetime and public-certificate security review",
+      "inputHelp": "JSON {\"kind\":\"jwt\",\"value\":\"token\",\"expectedIssuer\":\"optional\",\"expectedAudience\":\"optional\"} or {\"kind\":\"pem\",\"value\":\"public certificate PEM\"}.",
+      "inputKind": "json",
+      "limit": "256 KiB and32 certificates; no private keys, JWT signature verification, certificate trust verification or full CyberChef engine.",
+      "engine": "",
+      "engineAvailable": false
+    },
+    {
+      "id": "burp",
+      "name": "Burp Suite",
+      "coverage": "Captured API method/path, response, query-parameter and media-type contract checks",
+      "inputHelp": "JSON {\"spec\":OpenAPI3 document,\"har\":HAR1.2 document}. Optional target scopes one origin.",
+      "inputKind": "json",
+      "limit": "1000 operations/entries; offline declared contracts only. No Burp engine, interception, replay or authenticated behavioral testing.",
+      "engine": "",
+      "engineAvailable": false
+    }
+  ],
+  "formats": [
+    {
+      "id": "nmap",
+      "label": "Nmap XML",
+      "extension": ".xml"
+    },
+    {
+      "id": "nuclei",
+      "label": "Nuclei JSON / JSONL",
+      "extension": ".json,.jsonl"
+    },
+    {
+      "id": "har",
+      "label": "HTTP archive, HAR 1.2",
+      "extension": ".har,.json"
+    },
+    {
+      "id": "burp",
+      "label": "Burp issue XML",
+      "extension": ".xml"
+    },
+    {
+      "id": "shodan",
+      "label": "Shodan host JSON / JSONL",
+      "extension": ".json,.jsonl"
+    },
+    {
+      "id": "bbot",
+      "label": "BBOT event JSON / JSONL",
+      "extension": ".json,.jsonl"
+    },
+    {
+      "id": "bloodhound",
+      "label": "BloodHound v5/v6 collection JSON",
+      "extension": ".json"
+    },
+    {
+      "id": "aircrack",
+      "label": "Airodump-ng access-point CSV",
+      "extension": ".csv"
+    },
+    {
+      "id": "cloudfox",
+      "label": "CloudFox resource / endpoint CSV",
+      "extension": ".csv"
+    },
+    {
+      "id": "spiderfoot",
+      "label": "SpiderFoot event CSV",
+      "extension": ".csv"
+    },
+    {
+      "id": "recon-ng",
+      "label": "recon-ng host CSV",
+      "extension": ".csv"
+    },
+    {
+      "id": "sqlmap",
+      "label": "sqlmap results CSV",
+      "extension": ".csv"
+    },
+    {
+      "id": "metasploit",
+      "label": "Metasploit database XML",
+      "extension": ".xml"
+    },
+    {
+      "id": "tshark",
+      "label": "TShark packet JSON",
+      "extension": ".json"
+    }
+  ],
+  "tools": [
+    {
+      "id": "nmap",
+      "name": "Nmap",
+      "category": "Network",
+      "license": "NPSL; separate embedding terms",
+      "source": "https://nmap.org/book/man-legal.html",
+      "mode": "Native + optional installed engine",
+      "available": "Multi-address TCP, service banners and TLS; optional installed Nmap service detection",
+      "limit": "No UDP, NSE, OS fingerprinting or exploit execution."
+    },
+    {
+      "id": "wireshark",
+      "name": "Wireshark",
+      "category": "Network",
+      "license": "GPL-2.0-or-later",
+      "source": "https://www.wireshark.org/faq.html",
+      "mode": "Native assessment",
+      "available": "Offline classic PCAP and PCAPNG Ethernet conversation analysis",
+      "limit": "No live capture, full dissectors, reassembly or decryption."
+    },
+    {
+      "id": "metasploit",
+      "name": "Metasploit Framework",
+      "category": "Assessment",
+      "license": "BSD-style; components vary",
+      "source": "https://github.com/rapid7/metasploit-framework",
+      "mode": "Native assessment",
+      "available": "Service-correlated vulnerability triage with validated advisory references",
+      "limit": "Imported candidates require independent verification; no exploit, payload or session execution."
+    },
+    {
+      "id": "aircrack",
+      "name": "Aircrack-ng",
+      "category": "Wireless",
+      "license": "GPL-2.0; components vary",
+      "source": "https://github.com/aircrack-ng/aircrack-ng",
+      "mode": "Native assessment",
+      "available": "Offline 802.11/radiotap beacon security and management-event analysis",
+      "limit": "No radio capture, injection, deauthentication generation, cracking or WPA3 enforcement proof."
+    },
+    {
+      "id": "hashcat",
+      "name": "Hashcat",
+      "category": "Data",
+      "license": "MIT; review selected dependencies",
+      "source": "https://github.com/hashcat/hashcat",
+      "mode": "Native assessment",
+      "available": "Bounded offline verification of supplied password candidates against unsalted digests",
+      "limit": "At most256 hashes,4096 candidates,1million combinations. No Hashcat engine or salted formats; secrets are omitted from reports."
+    },
+    {
+      "id": "skipfish",
+      "name": "Skipfish",
+      "category": "Web",
+      "license": "Apache-2.0",
+      "source": "https://github.com/spinkham/skipfish",
+      "mode": "Native assessment",
+      "available": "Bounded same-origin crawling and per-page HTTP/browser configuration review",
+      "limit": "No JavaScript execution, authenticated flows, injection probes or Skipfish engine."
+    },
+    {
+      "id": "foremost",
+      "name": "Foremost",
+      "category": "Forensics",
+      "license": "Exact upstream license requires version review",
+      "source": "https://foremost.sourceforge.net/",
+      "mode": "Native assessment",
+      "available": "Structurally checked PNG, GIF, BMP and WAV byte-range recovery",
+      "limit": "32 artifact maximum; no decompression, disk/deleted-block recovery or full file decoder."
+    },
+    {
+      "id": "sqlmap",
+      "name": "sqlmap",
+      "category": "Web",
+      "license": "GPL-2.0 with upstream clarifications",
+      "source": "https://github.com/sqlmapproject/sqlmap",
+      "mode": "Native assessment",
+      "available": "Database error disclosure and captured request/error correlation",
+      "limit": "No injection probes, SQLMap engine, database extraction or database permission audit."
+    },
+    {
+      "id": "hping3",
+      "name": "hping3",
+      "category": "Network",
+      "license": "GPL-2.0",
+      "source": "https://github.com/antirez/hping",
+      "mode": "Native assessment",
+      "available": "Repeated TCP connect stability measurements and latency statistics",
+      "limit": "No raw packets, spoofing, floods, application payloads or hping engine."
+    },
+    {
+      "id": "shodan",
+      "name": "Shodan",
+      "category": "Discovery",
+      "license": "Proprietary hosted service; SDK licenses separate",
+      "source": "https://developer.shodan.io/api",
+      "mode": "Native assessment",
+      "available": "Indexed service exposure, CVE assertion, freshness and TLS expiry triage",
+      "limit": "Offline index evidence only; no live Shodan API, fresh collection or independent vulnerability verification."
+    },
+    {
+      "id": "spiderdomain",
+      "name": "Spiderdomain, unresolved name",
+      "category": "Discovery",
+      "license": "No verified upstream identity",
+      "source": "https://www.spiderfoot.net/",
+      "mode": "Native assessment",
+      "available": "DNS alias/PTR enrichment and offline DNS zone inventory review",
+      "limit": "Upstream identity unresolved. No takeover proof, zone transfer, DNSSEC or exhaustive discovery."
+    },
+    {
+      "id": "maltego",
+      "name": "Maltego",
+      "category": "Discovery",
+      "license": "Proprietary desktop platform",
+      "source": "https://www.maltego.com/",
+      "mode": "Native assessment",
+      "available": "Cross-report entity correlation, directed paths and relationship provenance",
+      "limit": "20 reports and1000 combined nodes/edges; exact entity matches only. No commercial transforms or external collection."
+    },
+    {
+      "id": "airgorah",
+      "name": "Airgorah",
+      "category": "Wireless",
+      "license": "MIT",
+      "source": "https://github.com/martin-olivier/airgorah",
+      "mode": "Native assessment",
+      "available": "Wireless snapshot comparison for protection downgrades and AP metadata changes",
+      "limit": "1000 records per snapshot. Offline evidence only; no radio operations or impersonation proof."
+    },
+    {
+      "id": "netcat",
+      "name": "Netcat",
+      "category": "Network",
+      "license": "Varies by implementation",
+      "source": "https://nmap.org/ncat/",
+      "mode": "Native assessment",
+      "available": "Fixed read-only service protocol probes and bounded response confirmation",
+      "limit": "No arbitrary payloads, shell, listeners, relay, TLS negotiation or netcat engine."
+    },
+    {
+      "id": "passive-recon",
+      "name": "Passive reconnaissance",
+      "category": "Discovery",
+      "license": "Methodology; native Apache-2.0 implementation",
+      "source": "https://www.rfc-editor.org/rfc/rfc1035",
+      "mode": "Native assessment",
+      "available": "Scoped CT evidence, native DNS and verified public TLS SAN collection",
+      "limit": "No CT API query, brute-force, discovered-host requests or complete asset inventory. Historical names do not prove live services."
+    },
+    {
+      "id": "spiderfoot",
+      "name": "SpiderFoot",
+      "category": "Discovery",
+      "license": "MIT",
+      "source": "https://github.com/smicallef/spiderfoot",
+      "mode": "Native assessment",
+      "available": "Scoped infrastructure event correlation, provenance and exposure review",
+      "limit": "1000 imported events. No module execution, personal profiling, independent-source proof or fresh collection."
+    },
+    {
+      "id": "sherlock",
+      "name": "Sherlock",
+      "category": "Discovery",
+      "license": "MIT",
+      "source": "https://github.com/sherlock-project/sherlock",
+      "mode": "Native assessment",
+      "available": "Explicit profile-response evidence quality and consistency review",
+      "limit": "32 supplied profiles only. No live enumeration, identity inference or account-existence claims; report values are withheld."
+    },
+    {
+      "id": "recon-ng",
+      "name": "recon-ng",
+      "category": "Discovery",
+      "license": "GPL-3.0",
+      "source": "https://github.com/lanmaster53/recon-ng",
+      "mode": "Native assessment",
+      "available": "Before/after infrastructure inventory reconciliation and source-set comparison",
+      "limit": "1000 combined records; offline snapshots only. Absence is not proof of decommissioning or takeover."
+    },
+    {
+      "id": "bbot",
+      "name": "BBOT",
+      "category": "Discovery",
+      "license": "AGPL-3.0",
+      "source": "https://github.com/blacklanternsecurity/bbot",
+      "mode": "Native assessment",
+      "available": "Scoped recursive-scan evidence graph, parent provenance and coverage frontier",
+      "limit": "1000 supplied events. No live recursive scanning, off-scope collection or ownership proof."
+    },
+    {
+      "id": "cloudfox",
+      "name": "CloudFox",
+      "category": "Cloud",
+      "license": "MIT",
+      "source": "https://github.com/BishopFox/cloudfox",
+      "mode": "Native assessment",
+      "available": "CloudFormation S3, RDS, security-group and IAM configuration checks",
+      "limit": "Selected static checks only; unresolved intrinsic expressions are unknown. No deployed inventory or effective-permission simulation."
+    },
+    {
+      "id": "evilginx3",
+      "name": "Evilginx3",
+      "category": "Session security",
+      "license": "Upstream project; not bundled",
+      "source": "https://attack.mitre.org/software/S9003/",
+      "mode": "Native assessment",
+      "available": "Defensive session-cookie, transport, caching, framing and password-form review",
+      "limit": "Defensive assessment only. No phishing proxy, interception, credential collection or MFA bypass; authentication design still needs authenticated review."
+    },
+    {
+      "id": "caido",
+      "name": "Caido",
+      "category": "Web",
+      "license": "Proprietary core; SDK licenses separate",
+      "source": "https://docs.caido.io/",
+      "mode": "Native assessment",
+      "available": "Paired HAR comparison and owner-defined expected-denial evidence review",
+      "limit": "Offline unambiguous endpoint comparisons only; no interception, replay or confirmed authorization-bypass claims."
+    },
+    {
+      "id": "nuclei",
+      "name": "Nuclei",
+      "category": "Assessment",
+      "license": "MIT engine; templates licensed separately",
+      "source": "https://github.com/projectdiscovery/nuclei",
+      "mode": "Native assessment",
+      "available": "Native HTTP exposure rules for directory listings, debug pages, embedded source maps and cookie configuration",
+      "limit": "Native rules only; no external template pack or Nuclei engine."
+    },
+    {
+      "id": "bloodhound",
+      "name": "BloodHound",
+      "category": "Identity",
+      "license": "Apache-2.0 CE; collectors have separate licenses",
+      "source": "https://github.com/SpecterOps/BloodHound",
+      "mode": "Native assessment",
+      "available": "Cross-collection directed directory-control path analysis",
+      "limit": "20 collections and1000 combined records. Selected membership/ACL paths only; no collector, exploit execution or effective-access proof."
+    },
+    {
+      "id": "cyberchef",
+      "name": "CyberChef",
+      "category": "Data",
+      "license": "Apache-2.0",
+      "source": "https://github.com/gchq/CyberChef",
+      "mode": "Native assessment",
+      "available": "JWT policy/lifetime and public-certificate security review",
+      "limit": "256 KiB and32 certificates; no private keys, JWT signature verification, certificate trust verification or full CyberChef engine."
+    },
+    {
+      "id": "burp",
+      "name": "Burp Suite",
+      "category": "Web",
+      "license": "Proprietary product; Community terms apply",
+      "source": "https://portswigger.net/burp/tc-community",
+      "mode": "Native assessment",
+      "available": "Captured API method/path, response, query-parameter and media-type contract checks",
+      "limit": "1000 operations/entries; offline declared contracts only. No Burp engine, interception, replay or authenticated behavioral testing."
+    }
+  ]
+}
