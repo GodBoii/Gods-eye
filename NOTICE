@@ -4,6 +4,12 @@ Copyright 2026 God's Eye contributors
 Original source code and rules are licensed under Apache License 2.0.
 Generated Protobuf bindings are generated from this project's schema.
 
+The Python migration candidate uses FastAPI, Pydantic, Starlette, Uvicorn,
+Protobuf and their locked runtime dependencies. Full installed runtime license
+texts are retained in licenses/python-libraries.txt. Exact artifact versions
+and hashes are recorded in backend/requirements.lock. The Go release remains
+in use during migration and retains the notices below.
+
 The complete God's Eye View source distribution is adapted under apps/earth.
 Copyright (c) 2026 Bilawal Sidhu. Source license: MIT.
 Upstream: https://github.com/bilawalsidhu/gods-eye-view
