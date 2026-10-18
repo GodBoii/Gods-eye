@@ -1,5 +1,7 @@
 # God's Eye
 
+Version 0.4 adds [26 native assessment modules](docs/assessment-modules.md) to Workbench, including scoped web crawling, exposure rules, API contract review, cloud-template analysis, directory paths and extended capture analysis. Nmap has an optional installed-engine adapter. The module names identify related workflows; they do not mean all 26 external suites are installed or fully reproduced.
+
 A local defensive auditing dashboard and CLI, with a separate public-source World view. The source scanner runs offline; optional HTTPS checks and world feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
 
 The complete God's Eye View source is now copied into `apps/earth` as a separate keyless Earth console with a minimal black interface. Open its [local console](http://127.0.0.1:4173/) for the full 3D globe, public-source layers, saved views, personal pins, weather inspection and map tools. The Excluded section lists disconnected paid and credential-dependent providers. The existing scanner, dashboard and compact World view remain available. See the [edition guide](docs/earth-edition.md) for exact scope and source/data attribution.
@@ -21,7 +23,7 @@ go build -o bin/godseye.exe ./cmd/godseye
 .\bin\godseye.exe serve --root .
 ```
 
-Open `http://127.0.0.1:8765`. Workbench provides report imports, TCP/DNS diagnostics, offline PCAP and file analysis, IAM policy review, local data recipes and evidence graphs. Tools lists the exact coverage and limits for all 26 requested reference tools. External scanner engines are not bundled or launched. See the [workbench guide](docs/tool-workbench.md) for supported formats, source reuse and CLI commands.
+Open `http://127.0.0.1:8765`. Workbench provides assessment modules, report imports, TCP/DNS diagnostics, offline capture and file analysis, cloud configuration review, data recipes and evidence graphs. Tools lists the coverage and limits for all 26 reference workflows. External engines are not bundled; the Assessments workflow can explicitly invoke an installed Nmap engine. See the [assessment guide](docs/assessment-modules.md) for execution and the [workbench guide](docs/tool-workbench.md) for original import formats, source reuse and licensing.
 
 Overview, Assets and Checks retain the existing source and HTTPS workflows. Source scans stay inside the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint without crawling or following redirects. The security pages use a minimal black theme; World view and Earth console retain their separate presentation.
 
