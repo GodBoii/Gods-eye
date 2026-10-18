@@ -25,6 +25,9 @@ func auditNmap(ctx context.Context, req ToolRequest) (*Report, error) {
 	if !req.Authorized {
 		return nil, fmt.Errorf("confirm authorization before active network assessment")
 	}
+	if req.Input != "" || req.Encoding != "" {
+		return nil, fmt.Errorf("Nmap assessment accepts a host and ports, not uploaded input")
+	}
 	if !validHost(req.Target) {
 		return nil, fmt.Errorf("provide one hostname or IP address, without a URL or CIDR")
 	}
