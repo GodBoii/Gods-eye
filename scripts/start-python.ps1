@@ -1,3 +1,4 @@
+#requires -Version 7.4
 param(
     [switch]$Build,
     [ValidateRange(1, 65535)][int]$Port = 8766,
@@ -41,20 +42,24 @@ if (!(Test-Path -LiteralPath $pythonExe) -or !(Test-Path -LiteralPath (Join-Path
     throw 'Run ./scripts/start-python.ps1 -Build first.'
 }
 New-Item -ItemType Directory -Path $candidateState -Force | Out-Null
+$expectedBuild = & $pythonExe -c 'from godseye.build import identity; print(identity())'
+if ($LASTEXITCODE -ne 0) { throw 'Could not identify this Python installation. Rebuild the candidate.' }
+$basePython = & $pythonExe -c 'import sys; print(sys._base_executable)'
+if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $basePython)) { throw 'Could not identify the Python runtime.' }
 $healthUrl = "http://127.0.0.1:$Port/api/health"
 $listener = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue
 if ($listener) {
     try { $health = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 3 } catch {
         throw "Port $Port contains an unrelated service. Choose another candidate port."
     }
-    if ($health.service -ne 'godseye' -or $health.runtime -ne 'python' -or $health.version -ne '0.5.0.dev1' -or $health.capabilities -notcontains 'source-scans-v1') {
+    if ($health.service -ne 'godseye' -or $health.runtime -ne 'python' -or $health.build -ne $expectedBuild -or $health.capabilities -notcontains 'https-checks-v1') {
         throw "Port $Port does not contain this Python candidate. Choose another candidate port."
     }
     Write-Host "Python candidate already running at http://127.0.0.1:$Port"
     return
 }
 $arguments = @('-m', 'godseye', 'serve', '--root', "`"$scanRoot`"", '--state', "`"$candidateState`"", '--web', "`"$webDist`"", '--port', $Port)
-$process = Start-Process -FilePath $pythonExe -ArgumentList $arguments -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $candidateState 'server.log') -RedirectStandardError (Join-Path $candidateState 'server-error.log')
+$process = Start-Process -FilePath $basePython -Environment @{ __PYVENV_LAUNCHER__ = $pythonExe } -ArgumentList $arguments -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $candidateState 'server.log') -RedirectStandardError (Join-Path $candidateState 'server-error.log')
 $ready = $false
 $deadline = [DateTime]::UtcNow.AddSeconds(15)
 while ([DateTime]::UtcNow -lt $deadline) {
@@ -62,7 +67,7 @@ while ([DateTime]::UtcNow -lt $deadline) {
     if ($process.HasExited) { throw 'Python candidate exited during startup. Read server-error.log in its isolated state directory.' }
     try {
         $health = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 1
-        if ($health.runtime -eq 'python' -and $health.version -eq '0.5.0.dev1' -and $health.capabilities -contains 'source-scans-v1') {
+        if ($health.runtime -eq 'python' -and $health.build -eq $expectedBuild -and $health.capabilities -contains 'https-checks-v1') {
             $ready = $true
             break
         }
@@ -73,5 +78,5 @@ if (!$ready) {
     throw 'Python candidate did not become ready within 15 seconds.'
 }
 Write-Host "Python candidate: http://127.0.0.1:$Port, process $($process.Id)"
-Write-Host 'Available: inventory, source scans, cancellation, JSON and SARIF exports.'
-Write-Host 'Workbench, HTTPS checks and World feeds remain migration work. Earth starts separately.'
+Write-Host 'Available: inventory, source scans, HTTPS checks, cancellation, JSON and SARIF exports.'
+Write-Host 'Workbench and World feeds remain migration work. Earth starts separately.'
