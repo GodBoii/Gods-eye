@@ -3,7 +3,8 @@
 param(
     [uri]$BaseUrl = 'http://127.0.0.1:8765',
     [string]$SourceTarget = 'internal',
-    [uri]$Website
+    [uri]$Website,
+    [string]$CliBinary
 )
 
 Set-StrictMode -Version Latest
@@ -129,7 +130,7 @@ try {
     $cancelled = Wait-Check $started.id
     Assert-Check 'Live scan cancellation' ($cancelled.status -eq 'cancelled') $cancelled.status
 
-    $binary = Join-Path (Split-Path $PSScriptRoot -Parent) 'bin/godseye.exe'
+    $binary = if ($CliBinary) { [System.IO.Path]::GetFullPath($CliBinary) } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'bin/godseye.exe' }
     if (-not (Test-Path -LiteralPath $binary)) { throw 'Build bin/godseye.exe before running the CLI checks.' }
     $limitedFile = Join-Path $testRoot 'limited.json'
     & $binary scan --max-findings 1 --out $limitedFile $candidateDir
