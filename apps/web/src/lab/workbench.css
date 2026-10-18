@@ -137,6 +137,24 @@
 .lab-diagnostic-form > button {
   justify-self: start;
 }
+.lab-diagnostic-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--text);
+  font:
+    12px/1.6 Consolas,
+    monospace;
+}
+.lab-diagnostic-form textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 .lab-wide {
   grid-column: 1 / -1;
 }
