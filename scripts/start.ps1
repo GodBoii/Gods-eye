@@ -33,7 +33,18 @@ $dashboardExe = Join-Path $projectRoot 'bin/godseye.exe'
 if (!(Test-Path -LiteralPath $dashboardExe) -or !(Test-Path -LiteralPath (Join-Path $earthRoot 'dist/index.html')) -or !(Test-Path -LiteralPath (Join-Path $dashboardRoot 'dist/index.html'))) { throw 'Build the applications first with ./scripts/start.ps1 -Build.' }
 foreach ($port in @(8765, 4173)) {
     $alreadyRunning = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
-    if ($alreadyRunning) { Write-Host "Port $port is already listening. Reusing the running service."; continue }
+    if ($alreadyRunning) {
+        if ($port -eq 8765) {
+            try { $health = Invoke-RestMethod -Uri 'http://127.0.0.1:8765/api/health' -TimeoutSec 3 } catch {
+                throw 'Port 8765 contains an older or unrelated service. Stop that service, then rebuild and restart Gods Eye. The frontend and backend must use the same build.'
+            }
+            if ($health.service -ne 'godseye' -or $health.capabilities -notcontains 'tool-assessments-v1') {
+                throw 'The running dashboard is incompatible with this frontend. Stop the old service, then rebuild and restart Gods Eye.'
+            }
+        }
+        Write-Host "Port $port is already listening. Reusing the verified running service."
+        continue
+    }
     if ($port -eq 8765) {
         $process = Start-Process -FilePath $dashboardExe -ArgumentList @('serve','--root','.') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $stateRoot 'dashboard.log') -RedirectStandardError (Join-Path $stateRoot 'dashboard-error.log')
     } else {
