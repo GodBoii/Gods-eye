@@ -12,6 +12,7 @@ import {
 import type { Catalog, Report, Summary } from "./api";
 import { Evidence } from "./Evidence";
 import { LocalRecipes, ProfileReview } from "./LocalRecipes";
+import { Assessments } from "./Assessments";
 import "./workbench.css";
 
 type Load =
@@ -272,6 +273,7 @@ function FileForm({ busy, perform }: { busy: boolean; perform: Perform }) {
 }
 
 const workspaceModes = [
+  { id: "assess", label: "Assessments", detail: "Run capability modules" },
   { id: "import", label: "Report import", detail: "14 documented formats" },
   { id: "network", label: "Network", detail: "TCP + DNS posture" },
   { id: "files", label: "Files & cloud", detail: "PCAP, recovery, IAM" },
@@ -282,7 +284,7 @@ const workspaceModes = [
 export default function Workbench() {
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [revision, setRevision] = useState(0);
-  const [mode, setMode] = useState("import");
+  const [mode, setMode] = useState("assess");
   const [report, setReport] = useState<Report | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -386,6 +388,22 @@ export default function Workbench() {
           ))}
         </aside>
         <div className="lab-operation-panel">
+          {mode === "assess" && (
+            <Assessments
+              busy={busy}
+              onRun={(input, file) =>
+                perform(
+                  (signal) =>
+                    request("/api/lab/assess", {
+                      method: "POST",
+                      signal,
+                      body: JSON.stringify(input),
+                    }).then((value) => reportSchema.parse(value)),
+                  file,
+                )
+              }
+            />
+          )}
           {mode === "import" && (
             <ImportForm catalog={load.catalog} busy={busy} perform={perform} />
           )}
