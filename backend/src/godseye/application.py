@@ -12,6 +12,7 @@ from godseye.config import Settings
 from godseye.contracts import RunRequest
 from godseye.inventory import Inventory, iso_time, utc_now
 from godseye.jobs import WorkerError, run_scan
+from godseye.webcheck import Check, inspect
 
 logger = logging.getLogger(__name__)
 
@@ -55,19 +56,21 @@ class Application:
             raise ValueError("Confirm that you own or are authorized to check the target")
         if not request.target or len(request.target.encode("utf-8")) > 1024:
             raise ValueError("A target is required")
-        if request.kind != "source":
-            raise ValueError("This Python candidate currently supports source scans only")
-        path = Path(request.target)
-        if path.is_absolute() or path.drive:
-            raise ValueError("use a workspace-relative directory")
-        try:
-            resolved = (self.settings.root / path).resolve(strict=True)
-        except OSError as error:
-            raise ValueError("directory does not exist") from error
-        if not resolved.is_relative_to(self.settings.root):
-            raise ValueError("directory must stay inside the configured workspace")
-        if not resolved.is_dir():
-            raise ValueError("target must be a directory")
+        resolved = self.settings.root
+        if request.kind == "source":
+            path = Path(request.target)
+            if path.is_absolute() or path.drive:
+                raise ValueError("use a workspace-relative directory")
+            try:
+                resolved = (self.settings.root / path).resolve(strict=True)
+            except OSError as error:
+                raise ValueError("directory does not exist") from error
+            if not resolved.is_relative_to(self.settings.root):
+                raise ValueError("directory must stay inside the configured workspace")
+            if not resolved.is_dir():
+                raise ValueError("target must be a directory")
+        elif request.kind not in {"website", "api", "backend", "application"}:
+            raise ValueError("This asset category supports inventory only")
         # All transitions occur synchronously on the one application event loop.
         if self._active is not None or self._closing:
             raise RunConflict("A check is already running; wait or cancel it first")
@@ -102,6 +105,11 @@ class Application:
     async def _execute(self, run_id: str, path: Path, cancelled: asyncio.Event) -> None:
         run = next(run for run in self.runs if run["id"] == run_id)
         try:
+            if run["kind"] != "source":
+                run["checks"] = await self._inspect(run["target"], run["kind"], cancelled)
+                run["reviewCount"] = sum(check["status"] == "review" for check in run["checks"])
+                run["status"] = "completed"
+                return
             output = await run_scan(path, cancelled)
             if output:
                 report = output["json"]
@@ -128,17 +136,37 @@ class Application:
             run["status"] = "failed"
             run["error"] = "Source scan worker failed"
             logger.error("source_scan_failed", extra={"operation_id": run_id})
+        except ValueError as error:
+            run["status"] = "failed"
+            run["error"] = str(error)
         except Exception:
             # Last application boundary: log a category, never exception input.
             run["status"] = "failed"
-            run["error"] = "Source scan failed"
-            logger.error("source_scan_failed", extra={"operation_id": run_id})
+            run["error"] = "Check failed"
+            logger.error("check_failed", extra={"operation_id": run_id})
         finally:
             if cancelled.is_set():
                 run["status"] = "cancelled"
             run["finishedAt"] = iso_time(utc_now())
             if self._active is not None and self._active[0] == run_id:
                 self._active = None
+
+    @staticmethod
+    async def _inspect(target: str, kind: str, cancelled: asyncio.Event) -> list[Check]:
+        request = asyncio.create_task(inspect(target, kind))
+        cancellation = asyncio.create_task(cancelled.wait())
+        try:
+            done, _ = await asyncio.wait(
+                {request, cancellation}, timeout=30, return_when=asyncio.FIRST_COMPLETED
+            )
+            if request in done and not cancelled.is_set():
+                return request.result()
+            cancelled.set()
+            return []
+        finally:
+            request.cancel()
+            cancellation.cancel()
+            await asyncio.gather(request, cancellation, return_exceptions=True)
 
     def cancel(self, run_id: str) -> str:
         run = next((run for run in self.runs if run["id"] == run_id), None)
