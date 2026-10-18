@@ -71,6 +71,7 @@ func TestNmapRequestBoundaries(t *testing.T) {
 		{Target: "127.0.0.1", Authorized: true},
 		{Target: "127.0.0.1", Ports: []int{80, 80}, Authorized: true},
 		{Target: "127.0.0.1", Ports: []int{65536}, Authorized: true},
+		{Target: "127.0.0.1", Ports: []int{80}, Authorized: true, Input: "ignored evidence"},
 	} {
 		if _, err := auditNmap(context.Background(), req); err == nil {
 			t.Fatalf("accepted invalid request: %+v", req)
