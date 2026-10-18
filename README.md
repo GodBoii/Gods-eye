@@ -1,5 +1,7 @@
 # God's Eye
 
+The [Python backend migration](documentation/08-implementation-ledger.md) has started. Its isolated candidate supports inventory and source scans with JSON/SARIF exports. Run `./scripts/start-python.ps1 -Build -Port 8876` on Windows. The remaining backend features and default launcher still use Go until their parity gates pass. See [Python setup](backend/README.md).
+
 Version 0.4 adds [26 native assessment modules](docs/assessment-modules.md) to Workbench, including scoped web crawling, exposure rules, API contract review, cloud-template analysis, directory paths and extended capture analysis. Nmap has an optional installed-engine adapter. The module names identify related workflows; they do not mean all 26 external suites are installed or fully reproduced.
 
 A local defensive auditing dashboard and CLI, with a separate public-source World view. The source scanner runs offline; optional HTTPS checks and world feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
