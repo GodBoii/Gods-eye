@@ -137,6 +137,12 @@
 .lab-diagnostic-form > button {
   justify-self: start;
 }
+.lab-diagnostic-form > * {
+  min-width: 0;
+}
+.lab-diagnostic-form .lab-footnote {
+  overflow-wrap: anywhere;
+}
 .lab-diagnostic-form textarea {
   width: 100%;
   max-width: 100%;
