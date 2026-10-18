@@ -78,3 +78,43 @@ func TestToolAssessmentBoundary(t *testing.T) {
 		t.Fatal("arbitrary executable accepted")
 	}
 }
+
+func TestAllReferenceToolsHaveAssessmentRoutes(t *testing.T) {
+	capabilities := ToolCapabilities()
+	if len(capabilities) != 26 || len(capabilities) != len(Catalog()) {
+		t.Fatalf("expected26 assessment modules, got%d", len(capabilities))
+	}
+	seen := map[string]bool{}
+	for _, capability := range capabilities {
+		if seen[capability.ID] || capability.Name == "" || capability.Coverage == "" || capability.InputHelp == "" || capability.Limit == "" {
+			t.Fatalf("invalid capability: %+v", capability)
+		}
+		seen[capability.ID] = true
+	}
+	for _, tool := range Catalog() {
+		if !seen[tool.ID] {
+			t.Fatalf("missing assessment route for%s", tool.ID)
+		}
+	}
+}
+
+func TestAssessmentNormalizesEmptyBrowserInputEncoding(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	go func() {
+		connection, err := listener.Accept()
+		if err != nil {
+			return
+		}
+		defer connection.Close()
+		_, _ = connection.Write([]byte("SSH-2.0-fixture\r\n"))
+	}()
+	port := listener.Addr().(*net.TCPAddr).Port
+	report, err := AuditTool(context.Background(), ToolRequest{Tool: "nmap", Target: "127.0.0.1", Ports: []int{port}, Authorized: true, Encoding: "text"})
+	if err != nil || report == nil || len(report.Observations) == 0 {
+		t.Fatal("browser target-only request failed", err)
+	}
+}
