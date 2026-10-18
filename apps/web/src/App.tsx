@@ -194,7 +194,7 @@ export default function App() {
         <div className="sidebar-bottom">
           <span className="status-dot" />
           <span>
-            Local server <small>v0.3 · open source</small>
+            Local server <small>v0.4 · open source</small>
           </span>
         </div>
       </aside>
@@ -243,7 +243,7 @@ export default function App() {
             <span className="build-label">
               LOCAL EDITION
               <br />
-              <strong>0.3 / ACTIVE BUILD</strong>
+              <strong>0.4 / ACTIVE BUILD</strong>
             </span>
           </div>
           {error && (
@@ -310,10 +310,19 @@ export default function App() {
                       </small>
                     </div>
                     <div>
-                      <span>Latest candidates</span>
+                      <span>
+                        {latest && latest.kind !== "source"
+                          ? "Latest review items"
+                          : "Latest candidates"}
+                      </span>
                       <strong>
                         {latest
-                          ? latest.findingCount.toString().padStart(2, "0")
+                          ? (latest.kind === "source"
+                              ? latest.findingCount
+                              : latest.reviewCount
+                            )
+                              .toString()
+                              .padStart(2, "0")
                           : "—"}
                       </strong>
                       <small>
