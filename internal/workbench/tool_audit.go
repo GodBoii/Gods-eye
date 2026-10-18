@@ -25,6 +25,9 @@ type toolAssessment struct {
 }
 
 var toolAssessments = []toolAssessment{
+	{ToolCapability{ID: "burp", Coverage: "Captured API method/path, response, query-parameter and media-type contract checks", InputKind: "json", InputHelp: `JSON {"spec":OpenAPI3 document,"har":HAR1.2 document}. Optional target scopes one origin.`, Limit: "1000 operations/entries; offline declared contracts only. No Burp engine, interception, replay or authenticated behavioral testing."}, auditBurp},
+	{ToolCapability{ID: "bloodhound", Coverage: "Cross-collection directed directory-control path analysis", InputKind: "json", InputHelp: `JSON {"collections":[BloodHound v5/v6 objects],"start":"exact ObjectIdentifier","end":"exact ObjectIdentifier"}; no live target.`, Limit: "20 collections and1000 combined records. Selected membership/ACL paths only; no collector, exploit execution or effective-access proof."}, auditBloodHound},
+	{ToolCapability{ID: "cyberchef", Coverage: "JWT policy/lifetime and public-certificate security review", InputKind: "json", InputHelp: `JSON {"kind":"jwt","value":"token","expectedIssuer":"optional","expectedAudience":"optional"} or {"kind":"pem","value":"public certificate PEM"}.`, Limit: "256 KiB and32 certificates; no private keys, JWT signature verification, certificate trust verification or full CyberChef engine."}, auditCyberChef},
 	{ToolCapability{ID: "caido", Coverage: "Paired HAR comparison and owner-defined expected-denial evidence review", InputKind: "json", InputHelp: `JSON {"baseline":HAR,"candidate":HAR,"expectDenied":["/optional-path"]}. Optional target scopes one origin.`, Limit: "Offline unambiguous endpoint comparisons only; no interception, replay or confirmed authorization-bypass claims."}, auditCaido},
 	{ToolCapability{ID: "cloudfox", Coverage: "CloudFormation S3, RDS, security-group and IAM configuration checks", InputKind: "json", InputHelp: "AWS CloudFormation JSON with Resources, or an IAM Statement policy. Leave target empty.", Limit: "Selected static checks only; unresolved intrinsic expressions are unknown. No deployed inventory or effective-permission simulation."}, auditCloudFox},
 	{ToolCapability{ID: "evilginx3", Coverage: "Defensive session-cookie, transport, caching, framing and password-form review", InputKind: "url-or-har", InputHelp: "One authorized URL for a baseline GET, or a HAR with response headers and optional HTML content.", Limit: "Defensive assessment only. No phishing proxy, interception, credential collection or MFA bypass; authentication design still needs authenticated review."}, auditEvilginx3},
@@ -85,6 +88,12 @@ func AuditTool(ctx context.Context, request ToolRequest) (*Report, error) {
 	}
 	if len(request.Ports) > 32 {
 		return nil, fmt.Errorf("provide at most 32 explicit ports")
+	}
+	if request.Encoding != "" && request.Encoding != "text" && request.Encoding != "base64" {
+		return nil, fmt.Errorf("choose text or base64 input encoding")
+	}
+	if request.Input == "" {
+		request.Encoding = ""
 	}
 	for _, spec := range toolAssessments {
 		if spec.capability.ID != request.Tool {
