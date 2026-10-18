@@ -3,6 +3,16 @@
 /reports/
 *.test
 coverage.out
+__pycache__/
+*.py[cod]
+.venv/
+.venv-runtime/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+/backend/build/
+/backend/dist/
 node_modules/
 /apps/web/dist/
 /apps/earth/dist/
