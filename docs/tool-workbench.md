@@ -1,5 +1,7 @@
 # Security workbench
 
+For version 0.4 assessment execution, use the [assessment modules guide](assessment-modules.md). The tables below describe the original import/native-subset workbench. Its statement that external engines are never launched has one new exception: explicit opt-in execution of an installed Nmap engine through the new Assessments workflow. Other vendor engines remain unbundled and unexecuted.
+
 The workbench adds native diagnostics and offline evidence analysis to God's Eye. The Tools page accounts for all 26 requested references with an explicit implementation mode, upstream link, license observation and limitation. This is not a bundle of 26 installed engines, and it does not reproduce the full feature set of these products.
 
 Open the local dashboard and select Workbench. The security pages use a black, neutral theme with compact navigation, visible keyboard focus and short button feedback. Reduced-motion preferences disable that feedback. World view and Earth console components and their styles are outside this change. The new theme is scoped out of both pages.
