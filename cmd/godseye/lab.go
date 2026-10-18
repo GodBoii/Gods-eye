@@ -17,7 +17,7 @@ import (
 
 func lab(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprintln(stderr, "Usage: godseye lab catalog|import|file|pcap|iam|tcp|dns [flags] [FILE]")
+		fmt.Fprintln(stderr, "Usage: godseye lab catalog|assess|import|file|pcap|iam|tcp|dns [flags] [FILE]")
 		return 2
 	}
 	flags := flag.NewFlagSet("lab "+args[0], flag.ContinueOnError)
