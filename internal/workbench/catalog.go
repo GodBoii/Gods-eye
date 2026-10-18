@@ -14,7 +14,7 @@ type Tool struct {
 
 // Available describes implemented behavior, never engine parity or installation.
 func Catalog() []Tool {
-	return []Tool{
+	tools := []Tool{
 		{"nmap", "Nmap", "Network", "NPSL; separate embedding terms", "https://nmap.org/book/man-legal.html", "Native + import", "TCP connect diagnostics and Nmap XML service inventory", "Nmap is not bundled or launched. No OS fingerprinting or NSE execution."},
 		{"wireshark", "Wireshark", "Network", "GPL-2.0-or-later", "https://www.wireshark.org/faq.html", "Native + import", "Classic Ethernet PCAP conversations and TShark JSON metadata", "No live capture, PCAPNG parsing, protocol dissector library or decryption."},
 		{"metasploit", "Metasploit Framework", "Assessment", "BSD-style; components vary", "https://github.com/rapid7/metasploit-framework", "Import", "MetasploitV5 database XML host, service and vulnerability labels", "No exploit, payload, session, credential or loot execution/import."},
@@ -42,4 +42,18 @@ func Catalog() []Tool {
 		{"cyberchef", "CyberChef", "Data", "Apache-2.0", "https://github.com/gchq/CyberChef", "Reused code subset", "Browser-local recipe chains, encoding, hashing, entropy and JWT inspection", "Two adapted helper algorithms. No full CyberChef engine or encryption suite."},
 		{"burp", "Burp Suite", "Web", "Proprietary product; Community terms apply", "https://portswigger.net/burp/tc-community", "Import", "Burp issue XML and HTTP archive review", "No Burp engine, scanner, intruder or intercepting proxy."},
 	}
+	for i := range tools {
+		for _, assessment := range toolAssessments {
+			if assessment.capability.ID == tools[i].ID {
+				tools[i].Available = assessment.capability.Coverage
+				tools[i].Limit = assessment.capability.Limit
+				tools[i].Mode = "Native assessment"
+				if assessment.capability.Engine != "" {
+					tools[i].Mode = "Native + optional installed engine"
+				}
+				break
+			}
+		}
+	}
+	return tools
 }
