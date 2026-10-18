@@ -1,10 +1,12 @@
 # Python implementation ledger
 
-Updated 18 October 2026. The migration has started. The default application remains on Go while the Python candidate implements inventory and source scanning. Go removal and full cutover have not happened.
+Updated 18 October 2026. The migration has started. The default application remains on Go while the Python candidate implements inventory, source scanning and HTTPS response checks. Go removal and full cutover have not happened.
 
 ## Baseline and isolation
 
 Implementation starts at `9482391`, after the planning commits. `git diff --exit-code 4d27de83ad087703b197432ccbf2870a5ea6164c 9482391 -- cmd internal api apps` passed, confirming no application-source drift from the planned baseline. The working tree was clean before implementation.
+
+The first foundation batch was pushed through `bd324ef`. The tested HTTPS/build-lifetime code batch was pushed through `1b8bff999292c9a5774445022391a7583c5c2993`. Every changed file has its own commit, as required. Cross-file changes were tested as complete batches; intermediate commits are not separate migration releases. The running candidate's health records its source build identity independently of these documentation-only follow-ups.
 
 The baseline was rebuilt as ignored `bin/godseye-go-baseline.exe`, using Go 1.27.2 on Windows. Its SHA256 is `df85bffbbdd867ab10e4891e7431ae8f8c0045cccf916e58e3d4f43ac2096399`; it reports version 0.4.0. Git retains the release source and the existing built executables remain untouched.
 
@@ -22,9 +24,10 @@ The effective catalog was captured with `bin/godseye-go-baseline.exe lab catalog
 - Python Protobuf bindings and type stubs generated from the unchanged schema with grpcio-tools 1.84.0. Canonical ProtoJSON preserves enums, uint64 strings, optional fields and oneofs.
 - Source JSON/SARIF exports and scan CLI exit codes, exclusive output files and Go duration units.
 - Dashboard source job admission, status polling, cancellation, retention and downloads. A spawned Python child owns scanner computation; the parent awaits cleanup before releasing admission.
+- HTTPS HEAD checks with first-address DNS pinning, verified TLS/SNI, explicit public-address exclusions, no proxy/cookies/redirects, bounded HTTP/1.1 headers and preserved review counts. The TLS stream exposes the verified certificate expiry; h11 handles HTTP parsing. This implements HEAD only. The proposed aiohttp GET adapters, DNS records and native diagnostic TLS still need separate acceptance.
 - A separate Windows preview launcher with a Python runtime/capability check. It cannot replace port 8765 or the root Go state.
 
-Python health advertises `inventory-v1` and `source-scans-v1` only. It deliberately does not advertise `workbench-v1` or `tool-assessments-v1` before their implementations exist. There is no Go subprocess fallback.
+Python health advertises `inventory-v1`, `source-scans-v1` and `https-checks-v1`. It deliberately does not advertise `workbench-v1` or `tool-assessments-v1` before their implementations exist. There is no Go subprocess fallback. A source build identifier captured at startup prevents the launcher from reusing a stale candidate after files change.
 
 ## Verification evidence
 
@@ -32,10 +35,10 @@ Reference environment: Windows, Python 3.13.3, Go 1.27.2, Node 22.15.0. Exact Py
 
 | Requirement | Command or case | Actual result | Scope and remaining gap |
 | --- | --- | --- | --- |
-| Existing backend baseline | Local Go toolchain `go test ./...` and `go vet ./...` | Pass | Existing meaningful tests retained; race detector and Linux runtime not rerun |
+| Existing backend baseline | Local Go toolchain `go test -count=1 ./...` and `go vet ./...` | Pass | Cache bypassed for the final baseline rerun; race detector and Linux runtime not rerun |
 | React dashboard regression | `npm test` and `npm run build` in `apps/web` | 11 pass, build pass | Existing UI code unchanged |
 | Earth free edition regression | `npm run test:free` in `apps/earth` | 26 pass | Initial attempt used a nonexistent `test:free-edition` script, then corrected to the actual script |
-| Python behavior and public-interface parity | `GODSEYE_GO_BASELINE` set, `python -m pytest backend/tests -q` | 91 pass | Includes 10 CLI parity cases and two real-listener parity cases; not all 156 Go test behaviors transferred |
+| Python behavior and public-interface parity | `GODSEYE_GO_BASELINE` set, `python -m pytest backend/tests -q` | 133 pass | Includes 10 CLI parity cases, two real-listener parity cases, real pinned TLS and HTTPS review cases; not all 156 Go test behaviors transferred |
 | Scan JSON/SARIF semantic parity | Clean/candidate/binary/file-count/file-byte fixtures, Unicode paths and HTML/U+2028 hash inputs | Pass | Only random IDs and timestamps normalized; fingerprints, producer digests, arrays, errors and gaps compared exactly |
 | Source scanner limits/privacy | `test_scanner.py`, CLI tests | Pass | Byte/record limits, pre-cancel, UTF-8/binary handling and credential omission; saturated concurrent retention and performance need broader comparison |
 | Root boundary prototype | Real Windows junction rejection, directory rename denial while pinned, child-name rejection, growth omission | Pass | Uses read handles, no reparse following and final-handle path checks before content reads; full adversarial platform matrix remains unverified |
@@ -45,6 +48,8 @@ Reference environment: Windows, Python 3.13.3, Go 1.27.2, Node 22.15.0. Exact Py
 | State ownership | Separate-process lock exclusion and release on process exit | Pass | Coordinates Python only; isolated state is still mandatory versus Go |
 | HTTP guards and errors | Real Go/Python listeners plus ASGI request tests | Pass | 19 boundary cases, legacy plain-text guard failures, JSON errors and security headers |
 | Job lifetime | Actual spawned scanner, second request 409, immediate cancel, terminal status and readmission | Pass | Child absent before admission release; future installed-engine descendants not implemented |
+| HTTPS substitution | Real local trusted TLS listener, wrong-name/untrusted certificates, forbidden second DNS lookup, mixed answer rejection and hostile proxy environment | Pass | First-address HEAD and SNI verified. No public-network test substitutes for these stable cases. |
+| Browser smoke | Existing built dashboard against Python on 8876 | Partial | Overview, inventory form and live HTTPS evidence render; no captured console errors. Workbench initially shows expected missing-route error, and static UI version/capability labels still describe the original release. Full UI parity and mobile verification remain pending. |
 | Static/type/format checks | Ruff check/format, strict mypy for Windows and Linux platforms | Pass | Linux type checking is not Linux runtime testing |
 | Schema generation | `python backend/tools/generate_protocol.py --check` | Pass | Compiler is build-only; schema is unchanged |
 | Package integrity | Hash-locked dependency installation and `pip check` | Pass | Native Windows development and fresh runtime environments |
@@ -62,10 +67,10 @@ The initial tests caught and fixed Windows stdout encoding and ineffective metad
 | 2. Python foundation | Package, boundary middleware, lifecycle and tested request handling implemented. Full subsystem wiring remains open. |
 | 3. Contracts and stores | Protocol and inventory implemented. Evidence normalization/store, World cache and their bidirectional compatibility remain open. |
 | 4. Scanner and reports | Initial scanner/CLI/exporter implemented and compared. Full platform, malformed/growth/saturation and performance acceptance remain open. |
-| 5. Network foundations | Pending |
+| 5. Network foundations | Public HEAD policy/transport and HTTPS evaluation implemented. Generic TCP/DNS/GET and native diagnostic certificate observation remain pending. |
 | 6. Imports and local analysis | Pending |
 | 7. Assessment modules | Pending, all 26 rows below |
-| 8. Dashboard coordinator/API | Source runs and inventory implemented. HTTPS, lab and assessment groups remain open. |
+| 8. Dashboard coordinator/API | Source/HTTPS runs and inventory implemented. Lab and assessment groups remain open. |
 | 9. World/Earth | Earth regression suite passes. Python World feeds and full browser verification pending. |
 | 10. Native/Docker packaging | Windows candidate launcher implemented. Full no-Go feature acceptance and Docker pending. |
 | 11. Release validation | Pending |
@@ -107,6 +112,8 @@ Each module needs its existing behavior tests, Python dispatch, API/CLI access, 
 
 ## Authorized final verification request
 
-The user supplied personal identifiers, a user-owned HTTPS website and an installed desktop app for final functional/security verification. Those values must remain in ignored local artifacts and must not enter test fixtures, commits or public reports. The installed desktop app has been located. Live-user testing is pending the relevant migrated functionality; current unit/parity results must not be presented as that final audit.
+The user supplied personal identifiers, a user-owned HTTPS website and an installed desktop app for final functional/security verification. Those values must remain in ignored local artifacts and must not enter test fixtures, commits or public reports. Preliminary target observations now live in ignored `.godseye/private-validation/verification.md` and `observations.json`. The website's one-response HTTPS review completed. Selected packaged desktop source was scanned and manually reviewed. This is not the requested final all-feature audit, which remains pending the remaining migration and suitable module inputs. Original desktop source/backend location was requested; installed files were not modified. Personal identifiers were not submitted to third-party lookup services.
 
-Next implementation work is evidence contracts/storage, network policy and HTTPS, followed by imports/local analysis and the individually accepted assessments. The existing working Go release remains the comparison implementation throughout that work. Removing it now would drop supported features.
+The HTTPS batch also fixed a Windows process-lifetime test failure. Terminating a virtual-environment redirector could return before the real server released its file lock. Real-listener tests and the launcher now bypass that redirector using the same environment mechanism as CPython's Windows multiprocessing launcher. State-copy parity then passed. The launcher reports the actual server PID.
+
+Next implementation work is evidence contracts/storage, remaining network adapters, imports/local analysis and the individually accepted assessments. The existing working Go release remains the comparison implementation throughout that work. Removing it now would drop supported features.
