@@ -1,6 +1,6 @@
 # Python backend migration plan
 
-Prepared 18 October 2026. Status: analysis and implementation plan only. No backend migration has been implemented by this documentation change.
+Prepared 18 October 2026. Implementation has started under `backend/`. The Python candidate supports inventory and source scanning; full cutover and Go retirement remain pending. See the [implementation ledger](08-implementation-ledger.md) for executed checks, completed work and remaining gates. Documents 01 through 07 retain the original analysis and migration plan.
 
 The target is a Python replacement for every currently implemented Go backend and CLI capability, with the existing React dashboard and separate Earth console continuing to work. Docker and Docker Desktop are optional operating modes. The completed migration must not invoke the old Go executable as a hidden fallback.
 
@@ -15,6 +15,7 @@ The target is a Python replacement for every currently implemented Go backend an
 | [Docker and local operation](05-docker-and-local-operation.md) | Windows/Linux operation, containers, volumes, host diagnostics and packaging |
 | [Validation, cutover and rollback](06-validation-cutover-and-rollback.md) | Comparison tests, performance criteria, release gates and recovery procedure |
 | [Source and test index](07-source-and-test-index.md) | Audited source inventory and existing Go test functions to transfer |
+| [Implementation ledger](08-implementation-ledger.md) | Current Python implementation, executed verification and outstanding parity gates |
 
 ## Recommended decisions
 
