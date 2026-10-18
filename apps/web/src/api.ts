@@ -34,6 +34,7 @@ export const runSchema = z.object({
   finishedAt: z.string().nullable(),
   files: z.number(),
   findingCount: z.number(),
+  reviewCount: z.number().default(0),
   findings: z.array(findingSchema),
   checks: z.array(
     z.object({ name: z.string(), status: z.string(), detail: z.string() }),
@@ -58,7 +59,15 @@ export async function request(
     ...options,
     headers: { "Content-Type": "application/json", "X-GodsEye-Request": "1" },
   });
-  const body: unknown = await response.json();
+  const text = await response.text();
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    throw new Error(
+      `Server returned HTTP ${response.status} without JSON. Check that the dashboard and server are from the same build.`,
+    );
+  }
   if (!response.ok) {
     const error = z.object({ error: z.string() }).safeParse(body);
     throw new Error(
