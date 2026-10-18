@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"godseye/internal/workbench"
 )
@@ -55,5 +56,59 @@ func TestToolAssessmentAPIExecutesAndPersists(t *testing.T) {
 	var capabilities []workbench.ToolCapability
 	if list.Code != 200 || json.Unmarshal(list.Body.Bytes(), &capabilities) != nil || len(capabilities) != len(workbench.ToolCapabilities()) {
 		t.Fatal("invalid capability API")
+	}
+}
+
+func TestToolAssessmentsBoundConcurrentExecution(t *testing.T) {
+	app, err := New(context.Background(), t.TempDir(), t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	handler := app.Handler("127.0.0.1:8765", t.TempDir())
+	started := make(chan struct{}, 2)
+	release := make(chan struct{})
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		started <- struct{}{}
+		<-release
+		w.Header().Set("Content-Type", "text/html")
+		_, _ = w.Write([]byte("<title>Fixture</title>"))
+	}))
+	t.Cleanup(page.Close)
+	t.Cleanup(func() { close(release) })
+	data, err := json.Marshal(workbench.ToolRequest{Tool: "nuclei", Target: page.URL, Authorized: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	finished := make(chan int, 2)
+	for i := 0; i < 2; i++ {
+		go func() { finished <- invoke(handler, "POST", "/api/lab/assess", string(data)).Code }()
+	}
+	for i := 0; i < 2; i++ {
+		select {
+		case <-started:
+		case <-time.After(3 * time.Second):
+			t.Fatal("assessment did not reach target")
+		}
+	}
+	third := invoke(handler, "POST", "/api/lab/assess", string(data))
+	if third.Code != 429 {
+		t.Fatal("third concurrent assessment was not rejected", third.Code)
+	}
+	// Release both real HTTP calls; cleanup also opens the gate on failure.
+	for i := 0; i < 2; i++ {
+		release <- struct{}{}
+	}
+	for i := 0; i < 2; i++ {
+		select {
+		case code := <-finished:
+			if code != 201 {
+				t.Fatal("concurrent assessment failed", code)
+			}
+		case <-time.After(3 * time.Second):
+			t.Fatal("assessment did not finish")
+		}
+	}
+	if reports := app.evidence.List(); len(reports) != 2 {
+		t.Fatalf("expected2 persisted reports, got%d", len(reports))
 	}
 }
