@@ -25,6 +25,12 @@ def server(command: list[str], root: Path, state: Path, web: Path) -> Iterator[h
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
     state.parent.mkdir(parents=True, exist_ok=True)
+    environment = None
+    if sys.platform == "win32" and command[0] == sys.executable:
+        # Match CPython's multiprocessing launcher. Bypass the venv redirector
+        # so the process handle owns the real server, including lock cleanup.
+        command = [sys._base_executable, *command[1:]]
+        environment = {**os.environ, "__PYVENV_LAUNCHER__": sys.executable}
     with (state.parent / f"{state.name}-server.log").open("w", encoding="utf-8") as log:
         process = subprocess.Popen(
             [
@@ -42,6 +48,7 @@ def server(command: list[str], root: Path, state: Path, web: Path) -> Iterator[h
             stdout=log,
             stderr=subprocess.STDOUT,
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+            env=environment,
         )
         try:
             with httpx.Client(base_url=f"http://127.0.0.1:{port}", trust_env=False) as client:
