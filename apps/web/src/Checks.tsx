@@ -87,7 +87,9 @@ export function Checks({
             <strong>{item.target}</strong>
             <span className="muted small">
               {new Date(item.startedAt).toLocaleTimeString()} ·{" "}
-              {item.findingCount} candidates
+              {item.kind === "source"
+                ? `${item.findingCount} candidates`
+                : `${item.reviewCount} review items`}
             </span>
           </button>
         ))}
