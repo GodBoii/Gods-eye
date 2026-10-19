@@ -1,6 +1,6 @@
 # Python implementation ledger
 
-Updated 18 October 2026. The migration has started. The default application remains on Go while the Python candidate implements inventory, source scanning and HTTPS response checks. Go removal and full cutover have not happened.
+Updated 19 October 2026. The migration has started. The default application remains on Go while the Python candidate implements inventory, source scanning and HTTPS response checks. Go removal and full cutover have not happened. The complete current application now has a tested root Docker Compose setup; see [container operation](10-docker-compose.md).
 
 ## Baseline and isolation
 
@@ -72,7 +72,7 @@ The initial tests caught and fixed Windows stdout encoding and ineffective metad
 | 7. Assessment modules | Pending, all 26 rows below |
 | 8. Dashboard coordinator/API | Source/HTTPS runs and inventory implemented. Lab and assessment groups remain open. |
 | 9. World/Earth | Earth regression suite passes. Python World feeds and full browser verification pending. |
-| 10. Native/Docker packaging | Windows candidate launcher implemented. Full no-Go feature acceptance and Docker pending. |
+| 10. Native/Docker packaging | Windows candidate launcher and root Compose packaging implemented. Current Go dashboard, separate Python candidate and keyless Earth built and tested on Linux containers. Python-only feature acceptance and the full platform matrix remain open. |
 | 11. Release validation | Pending |
 | 12. Default cutover | Pending |
 | 13. Go retirement | Pending, explicitly gated by feature parity |
@@ -117,3 +117,13 @@ The user supplied personal identifiers, a user-owned HTTPS website and an instal
 The HTTPS batch also fixed a Windows process-lifetime test failure. Terminating a virtual-environment redirector could return before the real server released its file lock. Real-listener tests and the launcher now bypass that redirector using the same environment mechanism as CPython's Windows multiprocessing launcher. State-copy parity then passed. The launcher reports the actual server PID.
 
 Next implementation work is evidence contracts/storage, remaining network adapters, imports/local analysis and the individually accepted assessments. The existing working Go release remains the comparison implementation throughout that work. Removing it now would drop supported features.
+
+## Container packaging, 19 October 2026
+
+The root `docker compose up --build` starts the full Go-served dashboard on 8765, the separate Python candidate on 8875, and the Node Earth console on 4173. Both frontends build inside Docker. There is no per-request Go fallback in the Python service, and each backend has an independent named state volume. Native state and existing native listeners were left intact.
+
+The first packaging code batch was pushed through `be50beb`, one file per commit. Backend wildcard binding is explicit through `--bind`; the accepted HTTP authority, Origin and mutation-header guards remain enforced. The source workspace is read-only, images exclude private/local state, all services use non-root users and the host publications are loopback-only.
+
+Docker Desktop's engine was started for this task. Image builds, service health, source scans/exports, import/recovery, read-only mount enforcement and inventory/evidence reopening after recreation passed. All Go tests passed inside the Linux build stage. Native Python verification now has 134 passing tests, and Earth's 26 free-edition tests pass inside its Node container. The added `npm start` dashboard proxy was exercised against the Compose backend, including rejected untrusted requests. Browser verification confirmed full Workbench and the Earth globe rendering.
+
+These checks supersede the earlier Docker-engine-unavailable observation for this packaging task. They accept the currently implemented container modes, not the unported Python modules or the complete migration release. Detailed commands and limits are recorded in the [Compose guide](10-docker-compose.md).
