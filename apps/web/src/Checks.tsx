@@ -41,8 +41,8 @@ export function Checks({
         <span className="empty-mark">⌕</span>
         <h2>No checks yet</h2>
         <p>
-          Start a source scan or HTTPS check from Overview. Results will appear
-          here.
+          Start a source scan or HTTPS check from Investigate. Results will
+          appear here.
         </p>
       </section>
     );
