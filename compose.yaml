@@ -1,0 +1,79 @@
+name: gods-eye
+
+x-runtime: &runtime
+  init: true
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 128
+  cpus: 2
+  stop_grace_period: 15s
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+
+services:
+  dashboard:
+    <<: *runtime
+    build:
+      context: .
+      target: dashboard
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - type: bind
+        source: ${GODSEYE_WORKSPACE:-.}
+        target: /workspace
+        read_only: true
+        bind:
+          create_host_path: false
+      - dashboard-state:/state
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    mem_limit: 1g
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  python-backend:
+    <<: *runtime
+    build:
+      context: .
+      target: python-backend
+    ports:
+      - "127.0.0.1:8875:8875"
+    volumes:
+      - type: bind
+        source: ${GODSEYE_WORKSPACE:-.}
+        target: /workspace
+        read_only: true
+        bind:
+          create_host_path: false
+      - python-state:/state
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    mem_limit: 1g
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  earth:
+    <<: *runtime
+    build:
+      context: .
+      target: earth
+    ports:
+      - "127.0.0.1:4173:4173"
+    volumes:
+      - earth-cache:/app/.gev-cache
+      - earth-logs:/app/.gev-logs
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    mem_limit: 1536m
+
+volumes:
+  dashboard-state:
+  python-state:
+  earth-cache:
+  earth-logs:
