@@ -38,6 +38,11 @@ bundle is included. See docs/open-source.md for distribution requirements.
 
 Dashboard runtime dependencies: React, React DOM, scheduler and Zod.
 These are MIT-licensed. Full upstream notices are in licenses/frontend.txt.
+Phone-number parsing uses libphonenumber-js 1.13.15, MIT.
+Copyright (c) 2016 @catamphetamine. Full notice: licenses/libphonenumber-js.txt.
+Optional email exposure checks query XposedOrNot's public API. Returned
+breach names are attributed to XposedOrNot; its database is not bundled.
+Provider documentation and terms: https://xposedornot.com/api_doc
 Frontend build tools include Vite (MIT) and TypeScript (Apache-2.0).
 Exact dependency versions and hashes are recorded in apps/web/package-lock.json.
 
