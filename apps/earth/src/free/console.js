@@ -39,8 +39,8 @@ export function mountFreeConsole(application) {
   const root = element('div', 'free-console');
   root.innerHTML = `
     <header class="free-header">
-      <a class="free-brand" href="http://127.0.0.1:8765"><span class="free-eye" aria-hidden="true">◉</span><span>GOD'S EYE<small>EARTH CONSOLE</small></span></a>
-      <nav aria-label="Workspaces"><a href="http://127.0.0.1:8765">Security</a><span aria-current="page">Earth</span></nav>
+      <a class="free-brand" href="${window.location.hostname === 'earth.polycognition.online' ? 'https://godseye.polycognition.online/' : 'http://127.0.0.1:8765'}"><img class="free-eye" src="/icons/icon-192.png" width="44" height="44" alt="" /><span>GOD'S EYE<small>EARTH CONSOLE</small></span></a>
+      <nav aria-label="Workspaces"><a href="${window.location.hostname === 'earth.polycognition.online' ? 'https://godseye.polycognition.online/' : 'http://127.0.0.1:8765'}">Security</a><span aria-current="page">Earth</span></nav>
       <button class="free-command" type="button">Search a place or command <kbd>Ctrl K</kbd></button>
       <span class="free-keyless"><i></i> KEYLESS EDITION</span>
       <button class="free-mobile-toggle" type="button" aria-expanded="false" aria-controls="free-sidebar">Layers</button>
