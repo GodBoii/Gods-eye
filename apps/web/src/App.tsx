@@ -15,7 +15,6 @@ import {
 } from "./api";
 import type { Asset, State } from "./api";
 
-const WorldView = lazy(() => import("./world/WorldView"));
 const Workbench = lazy(() => import("./lab/Workbench"));
 const ToolLibrary = lazy(() =>
   import("./lab/Workbench").then((module) => ({ default: module.ToolLibrary })),
@@ -26,7 +25,6 @@ type Page =
   | "Assets"
   | "Checks"
   | "Tools"
-  | "World view"
   | "Earth console";
 type Load =
   | { kind: "loading" }
@@ -124,7 +122,7 @@ export default function App() {
   const latest = data?.runs[0];
   return (
     <div
-      className={`app-shell${page === "World view" || page === "Earth console" ? "" : " security-skin"}`}
+      className={`app-shell${page === "Earth console" ? "" : " security-skin"}`}
     >
       <a href="#main" className="skip-link">
         Skip to workspace
@@ -156,7 +154,6 @@ export default function App() {
               "Assets",
               "Checks",
               "Tools",
-              "World view",
               "Earth console",
             ] satisfies Page[]
           ).map((item, index) => (
@@ -218,9 +215,7 @@ export default function App() {
                       ? "Asset inventory."
                       : page === "Checks"
                         ? "Check evidence."
-                        : page === "World view"
-                          ? "Explore the public picture."
-                          : page === "Earth console"
+                        : page === "Earth console"
                             ? "Beyond the workspace."
                             : "Tool coverage."}
               </h1>
@@ -233,9 +228,7 @@ export default function App() {
                       ? "Sites, APIs, source code and the infrastructure behind them."
                       : page === "Checks"
                         ? "Real check results, with coverage and limitations kept visible."
-                        : page === "World view"
-                          ? "Earthquakes, natural events, regional aircraft and orbital context. No provider keys."
-                          : page === "Earth console"
+                        : page === "Earth console"
                             ? "The full geospatial application, rebuilt for public sources."
                             : "What each integration provides, its source, license and limits."}
               </p>
@@ -277,17 +270,6 @@ export default function App() {
                 </Suspense>
               )}
               {page === "Earth console" && <EarthConsole />}
-              {page === "World view" && (
-                <Suspense
-                  fallback={
-                    <div className="panel empty" role="status">
-                      Loading world view…
-                    </div>
-                  }
-                >
-                  <WorldView />
-                </Suspense>
-              )}
               {page === "Overview" && (
                 <>
                   <section className="metrics" aria-label="Workspace summary">
