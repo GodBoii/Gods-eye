@@ -10,6 +10,47 @@ export function StepResult({
   item: PlanItem;
   outcome: Outcome;
 }) {
+  if (outcome.kind === "research")
+    return (
+      <section className="identifier-research" aria-label="Identifier research">
+        <dl className="identifier-facts">
+          {outcome.research.facts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="coverage-notes">
+          {outcome.research.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+        <details className="result-evidence">
+          <summary>
+            Explore public sources · {outcome.research.links.length} review
+            links
+          </summary>
+          <p className="muted small">
+            Opening a search or profile link shares its query with that service.
+            Results and account ownership remain unverified.
+          </p>
+          <div className="manual-links">
+            {outcome.research.links.map((link) => (
+              <a
+                key={link.url}
+                className="button"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label} ↗
+              </a>
+            ))}
+          </div>
+        </details>
+      </section>
+    );
   if (outcome.kind === "error")
     return (
       <p className="error">
@@ -40,6 +81,20 @@ export function StepResult({
     return (
       <>
         <p>{outcome.report.summary}</p>
+        {outcome.report.tool === "email-breaches" && (
+          <p className="muted small">
+            Source:{" "}
+            <a
+              href="https://xposedornot.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              XposedOrNot
+            </a>
+            . Historical indexed exposure does not prove current account
+            compromise.
+          </p>
+        )}
         <p className="muted small">
           {outcome.report.findings.length} findings ·{" "}
           {outcome.report.observations.length} observations ·{" "}
