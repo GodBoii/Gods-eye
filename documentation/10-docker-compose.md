@@ -10,11 +10,11 @@ The build installs dependencies and builds both frontends inside Docker. No host
 
 | URL | Service |
 | --- | --- |
-| [http://127.0.0.1:8765](http://127.0.0.1:8765) | Full security dashboard and current Go backend, including Workbench, assessments and compact World |
+| [http://127.0.0.1:8765](http://127.0.0.1:8765) | Full security dashboard and current Go backend, including Workbench and assessments |
 | [http://127.0.0.1:4173](http://127.0.0.1:4173) | Earth console with its keyless Node provider middleware |
 | [http://127.0.0.1:8875](http://127.0.0.1:8875) | Separate Python migration candidate, supporting inventory and source/HTTPS checks |
 
-Use port 8765 for the full product. Container packaging does not complete the Python migration. The `dashboard` service retains the current Go implementation while features move to `python-backend`. Each service has its own state volume. The Python candidate's Workbench and World routes remain unimplemented; its existing frontend starts on Workbench, so choose Overview, Assets or Checks there.
+Use port 8765 for the full product. Container packaging does not complete the Python migration. The `dashboard` service retains the current Go implementation while features move to `python-backend`. Each service has its own state volume. The Python candidate's Workbench routes remain unimplemented; its existing frontend starts on Workbench, so choose Overview, Assets or Checks there.
 
 All published ports bind to host loopback. The backend processes bind to container interfaces explicitly while retaining the configured Host/Origin/request-header checks. Use the URLs above, including `127.0.0.1`.
 
