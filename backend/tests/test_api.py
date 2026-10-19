@@ -38,6 +38,7 @@ def test_health_truthful_caps_static_and_headers(client: TestClient) -> None:
     assert health.json()["runtime"] == "python"
     assert health.json()["capabilities"] == ["inventory-v1", "source-scans-v1", "https-checks-v1"]
     assert client.head("/api/health").content == b""
+
     assert client.get("/").status_code == 200
     assert client.get("/api/state/").status_code == 404
     for path in ("/docs", "/openapi.json", "/api/lab/catalog", "/api/unknown"):
@@ -47,6 +48,19 @@ def test_health_truthful_caps_static_and_headers(client: TestClient) -> None:
     assert health.headers["cache-control"] == "no-store"
     assert health.headers["referrer-policy"] == "no-referrer"
     assert "frame-ancestors 'none'" in health.headers["content-security-policy"]
+
+
+def test_container_bind_preserves_host_and_origin_guards(settings: Settings) -> None:
+    from dataclasses import replace
+
+    container = replace(settings, bind="0.0.0.0").validated()
+    assert container.bind == "0.0.0.0"
+    with TestClient(create_app(container), base_url=BASE) as client:
+        assert client.get("/api/health").status_code == 200
+        assert client.get("/api/health", headers={"Host": "evil.example"}).status_code == 403
+        assert (
+            client.get("/api/health", headers={"Origin": "https://evil.example"}).status_code == 403
+        )
 
 
 @pytest.mark.parametrize(
