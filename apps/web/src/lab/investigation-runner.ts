@@ -5,8 +5,11 @@ import type { Run } from "../api";
 import { diagnose, reportSchema, upload } from "./api";
 import type { Report } from "./api";
 import type { PlanItem } from "./investigation-plan";
+import { researchIdentifier } from "./identifier-research";
+import type { Research } from "./identifier-research";
 
 export type Outcome =
+  | { kind: "research"; research: Research }
   | { kind: "queued" | "running" | "skipped" | "stopped" }
   | { kind: "error"; error: string }
   | { kind: "report"; report: Report }
@@ -37,6 +40,22 @@ export async function executeStep(
   signal.throwIfAborted();
   const op = item.operation;
   switch (op.kind) {
+    case "research":
+      return {
+        kind: "research",
+        research: researchIdentifier(op.researchKind, op.target),
+      };
+    case "breach":
+      return {
+        kind: "report",
+        report: reportSchema.parse(
+          await request("/api/lab/email-breaches", {
+            method: "POST",
+            signal,
+            body: JSON.stringify({ email: op.target, authorized: true }),
+          }),
+        ),
+      };
     case "context":
       return { kind: "context" };
     case "manual":
@@ -110,6 +129,8 @@ export async function executeStep(
 
 export function outcomeLabel(outcome: Outcome): string {
   switch (outcome.kind) {
+    case "research":
+      return "Local analysis / review links";
     case "run":
       return outcome.run.status === "completed"
         ? "Completed"
