@@ -132,7 +132,10 @@ function defaultProbeContext() {
       typeof OffscreenCanvas === 'function'
         ? new OffscreenCanvas(1, 1)
         : globalThis.document?.createElement('canvas');
-    return canvas?.getContext('webgl2') ?? null;
+    return (
+      canvas?.getContext('webgl2', { powerPreference: 'high-performance' }) ??
+      null
+    );
   } catch {
     return null;
   }
