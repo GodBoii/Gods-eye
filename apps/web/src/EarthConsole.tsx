@@ -11,11 +11,11 @@ export function EarthConsole() {
       </div>
       <div className="earth-entry-orbit" aria-hidden="true"><div /><span>◉</span><small>PUBLIC SOURCES / YOUR PERSPECTIVE</small></div>
       <div className="earth-entry-features">
-        <article><span>01</span><h3>Observe</h3><p>Aircraft, satellites, earthquakes, cameras, weather, transit and geographic infrastructure. Coverage depends on each source.</p></article>
+        <article><span>01</span><h3>Observe</h3><p>Aircraft, satellites, earthquakes, NASA natural events, cameras, weather, transit and geographic infrastructure. Coverage depends on each source.</p></article>
         <article><span>02</span><h3>Make it yours</h3><p>Save camera views, place pins, import map files, draw annotations and export your workspace. Search places and layers with Ctrl K.</p></article>
         <article><span>03</span><h3>See what was removed</h3><p>The Excluded section lists Google APIs, AI voice, token-based imagery, live traffic and other disconnected providers with their free alternatives.</p></article>
       </div>
-      <p className="earth-entry-note">The original compact World view remains available. The security scanner, assets and check reports continue in this workspace. Third-party data keeps its attribution and usage terms.</p>
+      <p className="earth-entry-note">Earth console brings the public geographic feeds together. The security scanner, assets and check reports continue in this workspace. Third-party data keeps its attribution and usage terms.</p>
     </section>
   );
 }
