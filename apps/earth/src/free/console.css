@@ -1,4 +1,11 @@
 /* The new edition owns the shell; inherited map tools keep their event wiring. */
+.free-natural-events { margin: 4px 0 16px; padding: 12px; border: 1px solid #292929; font-size: 12px; overflow-wrap: anywhere; }
+.free-natural-events summary { cursor: pointer; color: #d6eea0; }
+.free-natural-events input { width: 100%; box-sizing: border-box; margin-top: 12px; }
+.free-natural-events article { display: grid; gap: 7px; padding: 12px 0; border-bottom: 1px solid #292929; }
+.free-natural-events article button { text-align: left; white-space: normal; }
+.free-natural-events small, .free-natural-events p { color: #aaa; line-height: 1.5; }
+.free-natural-events a { color: #d6eea0; }
 .free-edition { --bg-dark:#000; --glass-bg:#0b0b0b; --glass-border:#292929; --glass-border-hover:#555; --accent:#d6eea0; --accent-dim:#d6eea014; --accent-glow:transparent; --text-primary:#eee; --text-secondary:#aaa; --text-dim:#888; --menu-bg:#111; --panel-radius:4px; --btn-radius:3px; --font-sans:'Segoe UI',Arial,sans-serif; background:#000; color:#eee; }
 .free-edition :is(.panel-glow,.title-glow,#title-bar,#style-indicator,#command-dock,#top-center-actions,#intel-hud,#data-panel,#street-level-panel,#welcome-overlay,#key-setup-overlay,#safe-frame-overlay) { display:none !important; }
 .free-edition #cesiumContainer { top:72px; left:290px; width:calc(100% - 290px); height:calc(100% - 72px); }
