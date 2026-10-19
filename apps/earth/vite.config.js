@@ -18,6 +18,7 @@ import { transitProxy } from './server/providers/transit.js';
 import { adsbLolProxy } from './server/providers/aircraft/adsb-lol.js';
 import { weatherProxy } from './server/providers/weather.js';
 import { firePerimetersProxy } from './server/providers/firePerimeters.js';
+import { naturalEventsProxy } from './server/providers/naturalEvents.js';
 import { gnssIntegrityProxy } from './server/providers/gnssIntegrity.js';
 import { cycloneProxy } from './server/providers/cyclones.js';
 import { windProxy } from './server/providers/wind.js';
@@ -38,7 +39,7 @@ export default defineConfig(({ command }) => {
     plugins: [freeEditionGateway(), celestrakProxy(), rocketLaunchesProxy(), terrainHeightsProxy(), adsbdbProxy(),
       overpassProxy(), militaryInstallationsProxy(), regionalBriefProxy(), geocodeProxy(), weatherEffectsProxy(),
       cctvProxy({ sourceRoot: defaultSourceRoot }), radioBrowserProxy(), gbfsProxy(), localReceiversProxy(),
-      transitProxy(), adsbLolProxy(), windProxy(), weatherProxy(), cycloneProxy(), firePerimetersProxy(), gnssIntegrityProxy(), freeRouting(), apiNotFoundPlugin()],
+      transitProxy(), adsbLolProxy(), windProxy(), weatherProxy(), cycloneProxy(), firePerimetersProxy(), naturalEventsProxy(), gnssIntegrityProxy(), freeRouting(), apiNotFoundPlugin()],
   });
   config.envDir = false;
   config.server.strictPort = true;
