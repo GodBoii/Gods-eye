@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 export function EarthConsole() {
+  const hosted = window.location.hostname === "godseye.polycognition.online";
+  const earthUrl = hosted ? "https://earth.polycognition.online/" : "http://127.0.0.1:4173/";
   return (
     <section className="earth-entry">
       <div className="earth-entry-intro">
         <span className="eyebrow">GOD'S EYE VIEW / KEYLESS EDITION</span>
         <h2>The whole Earth.<br />A little less noise.</h2>
         <p>The complete upstream source now lives in this workspace. Explore its 3D globe and public data layers in a separate console, with a new black interface and no provider-key setup.</p>
-        <a className="primary button" href="http://127.0.0.1:4173/">Open Earth console <span aria-hidden="true">↗</span></a>
-        <small>Runs locally on port 4173. Start both workspaces with scripts/start.ps1.</small>
+        <a className="primary button" href={earthUrl}>Open Earth console <span aria-hidden="true">↗</span></a>
+        <small>{hosted ? "Open the Earth console with your existing login." : "Runs locally on port 4173. Start both workspaces with scripts/start.ps1."}</small>
       </div>
       <div className="earth-entry-orbit" aria-hidden="true"><div /><span>◉</span><small>PUBLIC SOURCES / YOUR PERSPECTIVE</small></div>
       <div className="earth-entry-features">
