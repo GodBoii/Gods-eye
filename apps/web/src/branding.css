@@ -1,0 +1,13 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.workspace-header .workspace-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.workspace-brand .workspace-logo {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+}
