@@ -11,6 +11,7 @@ class Settings:
     state: Path
     web: Path
     port: int = 8765
+    bind: str = "127.0.0.1"
 
     @property
     def host(self) -> str:
@@ -19,6 +20,8 @@ class Settings:
     def validated(self) -> "Settings":
         if not 1 <= self.port <= 65535:
             raise ValueError("Invalid server arguments")
+        if self.bind not in {"127.0.0.1", "0.0.0.0"}:
+            raise ValueError("bind must be 127.0.0.1 or 0.0.0.0")
         root = self.root.resolve(strict=True)
         if not root.is_dir():
             raise ValueError("workspace must be a directory")
@@ -28,4 +31,4 @@ class Settings:
         state = self.state.resolve()
         if state == root:
             raise ValueError("state must have its own directory")
-        return Settings(root=root, state=state, web=web, port=self.port)
+        return Settings(root=root, state=state, web=web, port=self.port, bind=self.bind)
