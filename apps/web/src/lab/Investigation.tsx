@@ -147,7 +147,7 @@ export default function Investigation({
   const needsPermission = plan.some(
     (item) =>
       item.selected &&
-      ["check", "assessment", "dns"].includes(item.operation.kind),
+      ["check", "assessment", "dns", "breach"].includes(item.operation.kind),
   );
   function exportResult() {
     if (session.kind === "editing") return;
@@ -291,7 +291,8 @@ export default function Investigation({
             <p className="result-retention muted small">
               The full investigation stays in this tab until you start again or
               reload. Export it to retain input context and step statuses.
-              Individual automated reports are available in Saved results.
+              Server reports are available in Saved results. Local identifier
+              analysis and review links are included in this export only.
             </p>
           )}
           {session.kind === "finished" &&
