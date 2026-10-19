@@ -6,7 +6,7 @@ Every assessment returns normalized findings, observations, relationships and co
 
 ## Run a module
 
-Open Workbench > Assessments, select a module, read its input instructions, then supply a target, text or file. Confirm authorization and run. A module's name identifies the related workflow, not proof that the vendor's engine ran. Execution provenance and limitations are included in the result.
+Open Advanced > Specialist tools > Assessments, select a module, read its input instructions, then supply a target, text or file. Confirm authorization and run. For a guided plan from your inputs, start in Investigate. A module's name identifies the related workflow, not proof that the vendor's engine ran. Execution provenance and limitations are included in the result.
 
 Files up to 6 MiB are encoded for the JSON request. The server caps the encoded input at 8 MiB. Individual modules can impose smaller limits. Recovery downloads use the original file retained in the browser tab and are unavailable after reopening a saved report without that file.
 
