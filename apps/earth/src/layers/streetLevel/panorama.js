@@ -98,12 +98,15 @@ const isPowerOfTwo = (n) => n > 0 && (n & (n - 1)) === 0;
  * @returns {{setImage: (image: TexImageSource) => void, setView: (view: {yaw?: number, pitch?: number, fov?: number}) => void, getView: () => {yaw: number, pitch: number, fov: number}, resize: () => void, render: () => void, hasImage: () => boolean, destroy: () => void}}
  */
 export function createPanoramaRenderer(canvas) {
+  const contextOptions = {
+    antialias: false,
+    depth: false,
+    preserveDrawingBuffer: false,
+    powerPreference: 'high-performance',
+  };
   const gl =
-    canvas.getContext('webgl', {
-      antialias: false,
-      depth: false,
-      preserveDrawingBuffer: false,
-    }) || canvas.getContext('experimental-webgl');
+    canvas.getContext('webgl', contextOptions) ||
+    canvas.getContext('experimental-webgl', contextOptions);
   if (!gl) throw new Error('WebGL is unavailable');
 
   const program = gl.createProgram();
