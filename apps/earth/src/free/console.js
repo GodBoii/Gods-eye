@@ -4,6 +4,7 @@ import { readWorkspace, saveWorkspace, workspaceGeoJSON } from './workspace.js';
 import { setScopeMaskEnabled } from '../scopeMask.js';
 import { forecastAt } from './forecast.js';
 import { mountNaturalEvents } from './naturalEvents.js';
+import { readGraphicsStatus, graphicsStatusMessage } from './graphics.js';
 import './console.css';
 
 const descriptions = {
@@ -148,6 +149,11 @@ export function mountFreeConsole(application) {
       if (!layers.length) content.append(element('p', 'free-empty', 'No layers match your search.'));
       sync();
     } else if (tab === 'options') {
+      const graphics = readGraphicsStatus(viewer.canvas);
+      const renderer = element('p', 'free-explanation', graphics.renderer || 'Device identity not exposed');
+      renderer.style.overflowWrap = 'anywhere';
+      content.append(element('h2', '', 'Graphics'), element('p', 'free-explanation', graphicsStatusMessage(graphics)), renderer,
+        element('p', 'free-explanation', `Context preference: ${graphics.preference || 'not exposed'}. Target: ${viewer.targetFrameRate} FPS while animating. Idle rendering pauses when no animation needs frames.`));
       content.append(element('h2', '', 'Layer options'), element('p', 'free-explanation', 'The upstream controls for source filters, orbital groups, radio, routing and imagery. Options vary by layer.'), advancedLayers);
     } else if (tab === 'excluded') {
       content.append(element('h2', '', 'Excluded providers'), element('p', 'free-explanation', 'These integrations are disconnected. No key entry or billing setup exists in this edition. Free feeds still have their own terms and rate limits.'));
@@ -167,6 +173,9 @@ export function mountFreeConsole(application) {
       if (!workspace.pins.length) content.append(element('p', 'free-empty', 'Use Pin center to mark a location.'));
     }
   }
+  for (const event of ['webglcontextlost', 'webglcontextrestored']) viewer.canvas.addEventListener(event, () => {
+    if (tab === 'options') renderPanel();
+  }, { signal });
   for (const node of root.querySelectorAll('[data-tab]')) node.addEventListener('click', () => { tab = node.dataset.tab; renderPanel(); });
   find('.free-layer-search input').addEventListener('input', (event) => { query = event.target.value.toLowerCase(); renderPanel(); });
   find('.free-clear').addEventListener('click', () => void dataManager.clearSelectedLayers().catch((error) => notice(error.message)));
