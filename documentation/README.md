@@ -16,6 +16,7 @@ The target is a Python replacement for every currently implemented Go backend an
 | [Validation, cutover and rollback](06-validation-cutover-and-rollback.md) | Comparison tests, performance criteria, release gates and recovery procedure |
 | [Source and test index](07-source-and-test-index.md) | Audited source inventory and existing Go test functions to transfer |
 | [Implementation ledger](08-implementation-ledger.md) | Current Python implementation, executed verification and outstanding parity gates |
+| [Docker Compose operation](10-docker-compose.md) | One-command container startup, service URLs, persistent state and npm development |
 
 ## Recommended decisions
 
