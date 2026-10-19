@@ -4,7 +4,7 @@ The root `docker compose up --build` now starts this candidate on port 8875, the
 
 The current implementation runs inventory, source scans and single-response HTTPS checks, with JSON/SARIF exports, request guards, persistent inventory, one active check, cancellation and a spawned scan worker. It does not call Go. Python 3.13 is required. The exact tested patch is 3.13.3 on Windows. The preview launcher requires PowerShell 7.4 or newer.
 
-This is an intermediate implementation. World feeds, evidence stores, imports, diagnostics and the 26 assessments still run in the existing Go release. They are not advertised by the Python candidate. Do not use the candidate as the default backend until the remaining acceptance gates pass. See [the implementation ledger](../documentation/08-implementation-ledger.md).
+This is an intermediate implementation. Evidence stores, imports, diagnostics and the 26 assessments still run in the existing Go release. Geographic feeds run in the separate Earth console; the old World view has been removed. They are not advertised by the Python candidate. Do not use the candidate as the default backend until the remaining acceptance gates pass. See [the implementation ledger](../documentation/08-implementation-ledger.md).
 
 From the repository root on Windows:
 
@@ -12,7 +12,7 @@ From the repository root on Windows:
 ./scripts/start-python.ps1 -Build -Port 8876
 ```
 
-The script uses a separate port and `.godseye/python-preview` state. It refuses the default Go port/state and verifies the running backend's source build identity before reusing it. It builds only the existing dashboard. Earth's Node service remains separate. The current dashboard can exercise Overview, Assets and source/HTTPS Checks; Workbench and World need their Python implementations before cutover. The existing UI initially opens Workbench, which currently shows an expected missing-route error on this candidate. Use Overview, Assets or Checks for the migrated workflows. This is a cutover blocker, not a completed dashboard migration.
+The script uses a separate port and `.godseye/python-preview` state. It refuses the default Go port/state and verifies the running backend's source build identity before reusing it. It builds only the existing dashboard. Earth's Node service remains separate. The current dashboard can exercise Overview, Assets and source/HTTPS Checks; Workbench needs its Python implementation before cutover. The existing UI initially opens Workbench, which currently shows an expected missing-route error on this candidate. Use Overview, Assets or Checks for the migrated workflows. This is a cutover blocker, not a completed dashboard migration.
 
 For a development installation:
 
