@@ -3,11 +3,12 @@ import { EXCLUDED, layerAllowed } from './policy.js';
 import { readWorkspace, saveWorkspace, workspaceGeoJSON } from './workspace.js';
 import { setScopeMaskEnabled } from '../scopeMask.js';
 import { forecastAt } from './forecast.js';
+import { mountNaturalEvents } from './naturalEvents.js';
 import './console.css';
 
 const descriptions = {
   flights: 'adsb.lol · within 250 nautical miles', military: 'adsb.lol · reported aircraft', satellites: 'CelesTrak · calculated orbital positions',
-  earthquakes: 'USGS · past 24 hours', 'fire-perimeters': 'NIFC · reported fire boundaries', 'air-quality': 'ECCC · Canadian observations',
+  earthquakes: 'USGS · past 24 hours', 'natural-events': 'NASA EONET · open events, past 30 days', 'fire-perimeters': 'NIFC · reported fire boundaries', 'air-quality': 'ECCC · Canadian observations',
   'local-datacenters': 'OpenStreetMap · bundled snapshot', 'local-dams': 'OpenStreetMap · bundled snapshot',
   'telegeography-submarine-cables': 'TeleGeography · CC BY-NC-SA', cctv: 'Public traffic cameras · regional coverage',
   radio: 'Radio Browser · public streams', bikeshare: 'GBFS · supported cities', transit: 'Public transit · supported networks',
@@ -20,7 +21,7 @@ const descriptions = {
   'bhote-koshi-locator': 'Nepal · geographic context', 'local-adsb': 'Optional local receiver',
 };
 const jumps = [ ['Earth', 10, 20, 22000000], ['India', 78.96, 22.59, 5500000], ['Tokyo', 139.69, 35.68, 45000], ['Austin', -97.74, 30.27, 45000], ['Iceland', -19, 64.8, 900000] ];
-const priority = ['earthquakes', 'flights', 'satellites', 'weather-radar', 'wind', 'cctv', 'rocket-launches', 'fire-perimeters'];
+const priority = ['earthquakes', 'natural-events', 'flights', 'satellites', 'weather-radar', 'wind', 'cctv', 'rocket-launches', 'fire-perimeters'];
 const element = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; };
 const button = (text, action, className = '') => { const node = element('button', className, text); node.type = 'button'; node.addEventListener('click', action); return node; };
 
@@ -32,6 +33,7 @@ export function mountFreeConsole(application) {
   let workspace = { version: 1, views: [], pins: [] };
   let tab = 'layers';
   let query = '';
+  let updateNaturalEvents = null;
   const rows = new Map();
   const root = element('div', 'free-console');
   root.innerHTML = `
@@ -118,6 +120,7 @@ export function mountFreeConsole(application) {
       ui.row.title = error ? String(error) : descriptions[layer.id] || layer.source;
     }
     find('.free-active-count').textContent = `${active} ${active === 1 ? 'layer' : 'layers'} enabled`;
+    updateNaturalEvents?.();
   }
   async function restore(view) {
     for (const layer of dataManager.getAll().filter((layer) => layerAllowed(layer.id)))
@@ -126,6 +129,7 @@ export function mountFreeConsole(application) {
     notice(`Restored ${view.name}. Feed observations are current, not a historical replay.`);
   }
   function renderPanel() {
+    updateNaturalEvents = null;
     if (advancedLayers.parentNode !== advancedParent) advancedParent.append(advancedLayers);
     const content = find('.free-side-content'); content.replaceChildren(); rows.clear();
     find('.free-layer-search').hidden = tab !== 'layers';
@@ -134,7 +138,13 @@ export function mountFreeConsole(application) {
       content.append(element('div', 'free-section-label', 'DATA CATALOG'));
       const rank = (id) => priority.includes(id) ? priority.indexOf(id) : priority.length;
       const layers = dataManager.getAll().filter((layer) => layerAllowed(layer.id) && `${layer.name} ${descriptions[layer.id] || ''}`.toLowerCase().includes(query)).sort((a, b) => rank(a.id) - rank(b.id));
-      for (const layer of layers) content.append(layerRow(layer));
+      for (const layer of layers) {
+        content.append(layerRow(layer));
+        if (layer.id === 'natural-events') updateNaturalEvents = mountNaturalEvents(content, {
+          getLayer: () => dataManager.isEnabled('natural-events') ? dataManager.layers.get('natural-events')?.module : null,
+          fly,
+        });
+      }
       if (!layers.length) content.append(element('p', 'free-empty', 'No layers match your search.'));
       sync();
     } else if (tab === 'options') {
