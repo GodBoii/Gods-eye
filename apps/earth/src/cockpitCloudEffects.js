@@ -282,7 +282,7 @@ export class CockpitCloudEffectsController {
         stencil: false,
         premultipliedAlpha: false,
         preserveDrawingBuffer: false,
-        powerPreference: 'low-power',
+        powerPreference: 'high-performance',
       });
       if (!gl) throw new Error('WebGL unavailable');
 
