@@ -1,0 +1,40 @@
+# Use with: docker compose -f compose.yaml -f deploy/compose.ubuntu.yaml up -d --build --wait
+# Alternate loopback ports avoid the existing applications on ubuntu-server.
+services:
+  dashboard:
+    ports: !override
+      - "127.0.0.1:18765:8765"
+  python-backend:
+    ports: !override
+      - "127.0.0.1:18875:8875"
+  earth:
+    ports: !override
+      - "127.0.0.1:14173:4173"
+  gateway:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - ./deploy/cloudflare.nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      dashboard:
+        condition: service_healthy
+      earth:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    user: "101:101"
+    entrypoint: ["nginx", "-g", "daemon off;", "-e", "/dev/stderr"]
+    tmpfs:
+      - /var/cache/nginx:size=32m,uid=101,gid=101
+      - /var/run:size=1m,uid=101,gid=101
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 32
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
