@@ -6,7 +6,7 @@ Run `pwsh -File scripts/start.ps1 -Build` on the first run. Subsequent starts ca
 
 ## Active edition
 
-The new black interface uses the actual upstream Cesium viewer, catalog and lifecycle manager. Its 29 free layer entries cover reported civil and military aircraft, satellites, earthquakes, cameras, radio, public transport, bike sharing, weather, geographic infrastructure, cables and recorded case studies. Layers load only when enabled. Provider outages and coverage limits still apply. The Context and Map tools buttons expose inherited detail and display tools, including drawing, recording and local GeoJSON/KML/KMZ/GPX import. The Options tab preserves the upstream source filters and layer-specific controls.
+The black interface uses the upstream Cesium viewer, catalog and lifecycle manager. Its free layer entries cover reported civil and military aircraft, satellites, earthquakes, NASA natural events, cameras, radio, public transport, bike sharing, weather, geographic infrastructure, cables and recorded case studies. Layers load only when enabled. Provider outages and coverage limits still apply. The Context and Map tools buttons expose inherited detail and display tools, including drawing, recording and local GeoJSON/KML/KMZ/GPX import. The Options tab preserves the upstream source filters and layer-specific controls.
 
 Added in this edition:
 
@@ -15,6 +15,9 @@ Added in this edition:
 - GeoJSON export of personal pins, with saved camera views as collection metadata. Live third-party datasets are not silently copied into this export. Imported geographic files last for the browser session.
 - A weather inspector at the map center. Open-Meteo supplies current temperature, wind, humidity and a UTC daily temperature chart. The free hosted API is for noncommercial use and its data requires CC BY 4.0 attribution. See [Open-Meteo](https://open-meteo.com/).
 - Focus view, quick locations, day/night lighting and an explicit Excluded providers section.
+- NASA EONET natural events, migrated from the retired World view. Enable Natural events, then expand Natural event records for a searchable list, reported coordinates, observation dates, source links and map navigation. The layer shows the latest valid point per open event in the past 30 days, up to 100 provider events. Polygon-only events are omitted; the markers do not describe affected areas. Metadata may be approximate or revised. See the [NASA API documentation](https://eonet.gsfc.nasa.gov/docs/v3).
+
+The same-origin `GET /api/natural-events` endpoint is available on Earth console's port 4173 in development and production preview. It contacts one fixed keyless NASA URL, refuses redirects, limits response bodies to 2 MiB and applies a 12-second deadline. Concurrent requests share an acquisition. Valid snapshots are cached in memory for ten minutes; failures retain the last snapshot with a stale label and its original acquisition time, with a one-minute retry cooldown. A server restart clears this cache. No request parameters or arbitrary proxy URLs are accepted. Third-party source links are retained; linked articles and imagery are not copied.
 
 ## Removed from the running application
 
@@ -37,6 +40,6 @@ The aircraft proxy validates coordinates, limits response size, applies a deadli
 
 The upstream MIT license covers source code. Keep `apps/earth/LICENSE` and its attribution. Third-party models and data retain the notices in `apps/earth/DATA_SOURCES.md` and their own directories. TeleGeography cables use CC BY-NC-SA 3.0, and Bhote Koshi imagery uses CC BY-NC 4.0. These retained datasets are free for permitted noncommercial use; they are not granted unrestricted commercial rights. Other sources have attribution, share-alike, quota or regional limitations. Keyless access is not a guarantee of unlimited service or availability.
 
-The original security scanner, assets, HTTPS checks, report downloads, and compact World view remain independent of the Earth process. This console does not add an exploit runner or any of the previously listed pentesting tools.
+The security scanner, assets, HTTPS checks and report downloads remain independent of the Earth process. World view and its duplicate Go feed endpoints have been removed. Earth console already supplies the USGS, CelesTrak and ADSB.lol feeds; NASA EONET was the missing dataset and now runs in Earth console as well. Existing World view browser-storage pins and disk caches are left untouched, but are not automatically imported into Earth console. This console does not add an exploit runner or any of the previously listed pentesting tools.
 
 The copied source distribution includes large geographic datasets and binary models. A scan of the entire workspace therefore reports partial coverage under the scanner's existing input rules. This is intentional; the scanner does not silently skip those files and claim completion. The dashboard smoke script defaults to the native `internal` source directory, and its binary fixture separately verifies partial-coverage reporting. Use `-SourceTarget` to choose another source directory.
