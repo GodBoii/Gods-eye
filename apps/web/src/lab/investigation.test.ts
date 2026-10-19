@@ -16,6 +16,7 @@ test("format suggestions distinguish profiles, email, paths and ambiguous names"
     ["https://x.com/example", "profile"],
     ["name@example.com", "email"],
     ["+1 (202) 555-0100", "phone"],
+    ["1234567890123", "details"],
     ["example.com", "domain"],
     ["C:\\projects\\example", "source"],
     ["./project", "source"],
@@ -35,7 +36,7 @@ test("confirmed context determines routing and excludes deselected inputs", () =
   person.kind = "person";
   domain.included = false;
   const plan = buildPlan(inputs);
-  assert.equal(plan.length, 6);
+  assert.equal(plan.length, 8);
   assert.equal(
     plan.filter((item) => item.operation.kind === "assessment").length,
     2,
@@ -59,7 +60,11 @@ test("confirmed context determines routing and excludes deselected inputs", () =
         item.operation.checkKind === "source",
     ),
   );
-  assert.ok(plan.some((item) => item.operation.kind === "context"));
+  assert.ok(plan.some((item) => item.operation.kind === "research"));
+  assert.equal(
+    plan.find((item) => item.operation.kind === "breach")?.selected,
+    false,
+  );
   assert.ok(!plan.some((item) => item.inputId === domain.id));
   const first = inputs[0];
   assert.ok(first);
@@ -133,21 +138,13 @@ test("text parsing bounds input count and deduplicates exact repeated lines", ()
   );
 });
 
-test("photos route to byte analysis and personal details remain context only", () => {
+test("photos route to byte analysis and unsupported details remain context only", () => {
   const [input] = parseInputs("photo.png");
   assert.ok(input);
   const file = new File(["fixture"], "photo.png", { type: "image/png" });
   const [step] = buildPlan([{ ...input, kind: "photo", file }]);
   assert.equal(step?.operation.kind, "file");
-  for (const kind of [
-    "phone",
-    "person",
-    "address",
-    "company",
-    "app",
-    "details",
-    "username",
-  ] as const) {
+  for (const kind of ["address", "company", "app", "details"] as const) {
     assert.deepEqual(buildPlan([{ ...input, kind }])[0]?.operation, {
       kind: "context",
     });
