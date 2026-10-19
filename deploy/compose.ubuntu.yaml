@@ -20,8 +20,10 @@ services:
     depends_on:
       dashboard:
         condition: service_healthy
+        restart: true
       earth:
         condition: service_healthy
+        restart: true
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
