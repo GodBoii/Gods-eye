@@ -35,9 +35,11 @@ go build -o bin/godseye.exe ./cmd/godseye
 .\bin\godseye.exe serve --root .
 ```
 
-Open `http://127.0.0.1:8765`. Workbench provides assessment modules, report imports, TCP/DNS diagnostics, offline capture and file analysis, cloud configuration review, data recipes and evidence graphs. Tools lists the coverage and limits for all 26 reference workflows. External engines are not bundled; the Assessments workflow can explicitly invoke an installed Nmap engine. See the [assessment guide](docs/assessment-modules.md) for execution and the [workbench guide](docs/tool-workbench.md) for original import formats, source reuse and licensing.
+Open `http://127.0.0.1:8765`. The default Investigate screen guides you through adding inputs, confirming their types, reviewing selected checks and reading results. Paste one input per line or attach photos and evidence files. The plan selects supported checks from the confirmed context and shows manual-review and unsupported inputs explicitly. See the [investigation guide](documentation/12-guided-investigations.md) for the exact routing and retention rules.
 
-Overview, Assets and Checks retain the existing source and HTTPS workflows. Source scans stay inside the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint without crawling or following redirects. The security pages use a minimal black theme; Earth console retains its separate presentation.
+Saved results contains normalized analysis reports and session-only source/HTTPS checks. Advanced contains the specialist workbench, asset inventory and tool coverage. The workbench retains assessment modules, report imports, TCP/DNS diagnostics, offline capture and file analysis, cloud configuration review, data recipes and evidence graphs. External engines are not bundled; Advanced > Specialist tools > Assessments can explicitly invoke an installed Nmap engine. See the [assessment guide](docs/assessment-modules.md) and [workbench guide](docs/tool-workbench.md).
+
+Source scans stay inside the configured workspace. The HTTPS response check inspects one authorized public endpoint without crawling or following redirects. The separately selected exposure review fetches that URL; the optional linked-page review crawls up to eight same-origin pages. Earth console retains its separate application.
 
 Earth console includes USGS earthquakes, NASA EONET natural events, calculated satellite positions and viewport-scoped ADSB.lol aircraft reports. Enable Natural events in Layers, then expand Natural event records to inspect categories, observation dates, coordinates and provider links or jump to a reported point.
 
