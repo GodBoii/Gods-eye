@@ -14,6 +14,7 @@ import (
 // Workbench requests use the parent dashboard's Host, Origin and custom-header
 // protections. At most two bounded operations can occupy handlers at once.
 func (s *Server) registerWorkbench(mux *http.ServeMux) {
+	breaches := workbench.NewBreachChecker()
 	capacity := make(chan struct{}, 2)
 	bounded := func(next func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +98,21 @@ func (s *Server) registerWorkbench(mux *http.ServeMux) {
 			fail(w, 400, "Choose tcp or dns diagnostics")
 			return
 		}
+		s.saveEvidence(w, report, err)
+	}))
+	mux.HandleFunc("POST /api/lab/email-breaches", bounded(func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Email      string `json:"email"`
+			Authorized bool   `json:"authorized"`
+		}
+		if !decode(w, r, &input) {
+			return
+		}
+		if !input.Authorized {
+			fail(w, 400, "Confirm permission to send this email address to XposedOrNot")
+			return
+		}
+		report, err := breaches.Check(r.Context(), input.Email)
 		s.saveEvidence(w, report, err)
 	}))
 }
