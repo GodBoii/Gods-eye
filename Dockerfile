@@ -17,7 +17,7 @@ COPY gen/go/ ./gen/go/
 RUN go test ./... \
     && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/godseye ./cmd/godseye
 
-FROM python:3.13.3-slim-bookworm AS python-build
+FROM python:3.13.16-slim-bookworm AS python-build
 WORKDIR /build/python
 COPY backend/requirements.lock ./
 RUN pip install --no-cache-dir --require-hashes --prefix=/install -r requirements.lock
@@ -47,7 +47,7 @@ ENTRYPOINT ["godseye"]
 CMD ["serve", "--bind", "0.0.0.0", "--root", "/workspace", "--state", "/state", "--web", "/app/web"]
 
 # Separate, explicit Python candidate. Its state is never shared with Go.
-FROM python:3.13.3-slim-bookworm AS python-backend
+FROM python:3.13.16-slim-bookworm AS python-backend
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 RUN groupadd --gid 10001 godseye \
     && useradd --uid 10001 --gid godseye --no-create-home godseye \
