@@ -18,7 +18,6 @@ import (
 	"godseye/internal/secrets"
 	"godseye/internal/webcheck"
 	"godseye/internal/workbench"
-	"godseye/internal/world"
 )
 
 type Finding struct {
@@ -55,7 +54,6 @@ type Server struct {
 	assets   []Asset
 	runs     []*Run
 	context  context.Context
-	world    *world.Service
 	evidence *workbench.Store
 }
 
@@ -81,7 +79,7 @@ func New(ctx context.Context, root, stateDir string) (*Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open workbench evidence: %w", err)
 	}
-	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx, world: world.New(filepath.Join(stateDir, "world-cache")), evidence: evidence}, nil
+	return &Server{root: absolute, file: file, assets: assets, runs: []*Run{}, context: ctx, evidence: evidence}, nil
 }
 
 func (s *Server) Handler(host, dist string) http.Handler {
@@ -92,14 +90,6 @@ func (s *Server) Handler(host, dist string) http.Handler {
 		send(w, 200, map[string]any{"service": "godseye", "version": "0.4.0", "capabilities": []string{"workbench-v1", "tool-assessments-v1"}})
 	})
 	mux.HandleFunc("GET /api/state", s.state)
-	mux.HandleFunc("GET /api/world/{layer}", func(w http.ResponseWriter, r *http.Request) {
-		snapshot, ok := s.world.Snapshot(r.Context(), r.PathValue("layer"))
-		if !ok {
-			fail(w, 404, "Unknown public data layer")
-			return
-		}
-		send(w, 200, snapshot)
-	})
 	mux.HandleFunc("POST /api/assets", s.addAsset)
 	mux.HandleFunc("DELETE /api/assets/{id}", s.removeAsset)
 	mux.HandleFunc("POST /api/runs", s.startRun)
