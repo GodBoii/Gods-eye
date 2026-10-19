@@ -37,7 +37,7 @@ test('every acquisition source can be omitted without losing catalog membership'
 
 test('all acquisition sources may be absent, and enable fails before initializing or fetching', async (t) => {
   const actual = catalog({}, t);
-  assert.equal(actual.layers.length, 32);
+  assert.equal(actual.layers.length, 33);
   const manager = new LayerLifecycle(
     {},
     { getSourceAvailability: actual.getSourceAvailability },
@@ -86,7 +86,7 @@ test('standalone defaults allow exact replacements and explicit removal, and rej
   );
 });
 
-test('empty Street Level uses the shared unavailable lifecycle without initialization', async (t) => {
+test('empty Street Level uses the unavailable lifecycle and keyless defaults keep it excluded', async (t) => {
   const actual = catalog({}, t);
   const manager = new LayerLifecycle(
     {},
@@ -102,7 +102,7 @@ test('empty Street Level uses the shared unavailable lifecycle without initializ
   const configured = catalog(createStandaloneLayerSources(), t);
   assert.equal(
     configured.get('street-level').getSourceAvailability().available,
-    true,
+    false,
   );
 });
 
