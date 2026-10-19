@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "start": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test src/world/*.test.ts src/lab/*.test.ts"
