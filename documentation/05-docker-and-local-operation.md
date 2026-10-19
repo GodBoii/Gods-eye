@@ -1,5 +1,7 @@
 # Docker and local operation
 
+Implementation update, 19 October 2026: the root Dockerfile and Compose setup package the complete current Go dashboard, the separate Python candidate and Earth. Use the [current operating guide](10-docker-compose.md). The sections below retain the original design for the completed Python-only deployment; that migration is still pending.
+
 Status: operating design for implementation. No Dockerfile, Compose configuration, Python server or changed launcher is created by this planning task. Commands below are future interfaces to implement and verify.
 
 ## Supported operating modes
