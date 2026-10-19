@@ -41,13 +41,12 @@ These are MIT-licensed. Full upstream notices are in licenses/frontend.txt.
 Frontend build tools include Vite (MIT) and TypeScript (Apache-2.0).
 Exact dependency versions and hashes are recorded in apps/web/package-lock.json.
 
-World view includes MIT source helpers from bilawalsidhu/gods-eye-view,
-Copyright (c) 2026 Bilawal Sidhu. Full notice: licenses/gods-eye-view.txt.
-The vendored files identify upstream paths and pinned commit hashes.
-World view uses D3 (ISC) and satellite.js (MIT); notices are retained in
-licenses/world-libraries.txt. Natural Earth land geometry is public domain.
-ADSB.lol live aircraft data is ODbL 1.0, with attribution in the UI and exports.
-Public feed data is separate from the source-code license. See docs/world-view.md.
+The retired World view used MIT source helpers from bilawalsidhu/gods-eye-view,
+Copyright (c) 2026 Bilawal Sidhu, D3 (ISC) and satellite.js (MIT).
+Historical notices remain in licenses/gods-eye-view.txt and licenses/world-libraries.txt.
+Its NASA EONET natural-event feed now runs in Earth console.
+ADSB.lol live aircraft data is ODbL 1.0. Public feed data is separate from
+the source-code license. See docs/earth-edition.md for active sources and terms.
 
 The security workbench adapts two helper algorithms from gchq/CyberChef,
 commit cc70a4530b86aff4bc40ccc74b1ad4857eccdca2:
