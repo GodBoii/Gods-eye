@@ -23,10 +23,11 @@ func serve(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	dist := flags.String("web", "apps/web/dist", "Built frontend directory")
 	state := flags.String("state", ".godseye", "Local inventory storage directory")
 	port := flags.Int("port", 8765, "Loopback HTTP port")
+	bind := flags.String("bind", "127.0.0.1", "Listen address: 127.0.0.1, or 0.0.0.0 inside a container")
 	if err := flags.Parse(args); err != nil {
 		return 2
 	}
-	if flags.NArg() != 0 || *port < 1 || *port > 65535 {
+	if flags.NArg() != 0 || *port < 1 || *port > 65535 || (*bind != "127.0.0.1" && *bind != "0.0.0.0") {
 		fmt.Fprintln(stderr, "Invalid server arguments")
 		return 2
 	}
@@ -40,7 +41,7 @@ func serve(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 2
 	}
 	host := fmt.Sprintf("127.0.0.1:%d", *port)
-	listener, err := net.Listen("tcp", host)
+	listener, err := net.Listen("tcp", net.JoinHostPort(*bind, fmt.Sprint(*port)))
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 2
