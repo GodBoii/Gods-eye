@@ -12,9 +12,9 @@ The [Python backend migration](documentation/08-implementation-ledger.md) has st
 
 Version 0.4 adds [26 native assessment modules](docs/assessment-modules.md) to Workbench, including scoped web crawling, exposure rules, API contract review, cloud-template analysis, directory paths and extended capture analysis. Nmap has an optional installed-engine adapter. The module names identify related workflows; they do not mean all 26 external suites are installed or fully reproduced.
 
-A local defensive auditing dashboard and CLI, with a separate public-source World view. The source scanner runs offline; optional HTTPS checks and world feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
+A local defensive auditing dashboard and CLI, with a separate public-source Earth console. The source scanner runs offline; optional HTTPS checks and Earth feeds use the network. Original code and rules are Apache-2.0, with attributed third-party helpers under their own licenses. No account, subscription, API key or paid service is needed.
 
-The complete God's Eye View source is now copied into `apps/earth` as a separate keyless Earth console with a minimal black interface. Open its [local console](http://127.0.0.1:4173/) for the full 3D globe, public-source layers, saved views, personal pins, weather inspection and map tools. The Excluded section lists disconnected paid and credential-dependent providers. The existing scanner, dashboard and compact World view remain available. See the [edition guide](docs/earth-edition.md) for exact scope and source/data attribution.
+The complete God's Eye View source is adapted in `apps/earth` as a keyless Earth console with a minimal black interface. Open its [local console](http://127.0.0.1:4173/) for the 3D globe, public-source layers, saved views, personal pins, weather inspection and map tools. NASA EONET natural events have moved here from the retired World view. The Excluded section lists disconnected paid and credential-dependent providers. See the [edition guide](docs/earth-edition.md) for exact scope and source/data attribution.
 
 On Windows, build and start both workspaces with `pwsh -File scripts/start.ps1 -Build`. Later starts can omit `-Build`. The Earth process is separate from the Go dashboard and runs on loopback port 4173. Its active configuration never loads provider credentials. The full upstream source includes historical provider modules for provenance; they are disconnected from this edition.
 
@@ -35,9 +35,9 @@ go build -o bin/godseye.exe ./cmd/godseye
 
 Open `http://127.0.0.1:8765`. Workbench provides assessment modules, report imports, TCP/DNS diagnostics, offline capture and file analysis, cloud configuration review, data recipes and evidence graphs. Tools lists the coverage and limits for all 26 reference workflows. External engines are not bundled; the Assessments workflow can explicitly invoke an installed Nmap engine. See the [assessment guide](docs/assessment-modules.md) for execution and the [workbench guide](docs/tool-workbench.md) for original import formats, source reuse and licensing.
 
-Overview, Assets and Checks retain the existing source and HTTPS workflows. Source scans stay inside the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint without crawling or following redirects. The security pages use a minimal black theme; World view and Earth console retain their separate presentation.
+Overview, Assets and Checks retain the existing source and HTTPS workflows. Source scans stay inside the configured workspace. HTTPS checks inspect one explicitly authorized public endpoint without crawling or following redirects. The security pages use a minimal black theme; Earth console retains its separate presentation.
 
-World view provides an interactive vector globe, live public earthquake/natural-event layers, calculated space-station positions, a central-India aircraft feed, saved browser-local pins and GeoJSON export. It reuses two MIT source helpers from God's Eye View with attribution. It needs no paid API, API key or external map tiles. See [World view sources and limitations](docs/world-view.md) for exact coverage and data-license terms.
+Earth console includes USGS earthquakes, NASA EONET natural events, calculated satellite positions and viewport-scoped ADSB.lol aircraft reports. Enable Natural events in Layers, then expand Natural event records to inspect categories, observation dates, coordinates and provider links or jump to a reported point.
 
 Inventory is saved in `.godseye/assets.json`. Source/HTTPS check history lasts for the server session, capped at 20 runs. Workbench evidence persists in `.godseye/evidence/`, retaining the newest 20 normalized reports. Raw uploads are not saved. Export important reports before retention removes older evidence. Do not put credentials in asset names or targets. This local server has no shared-user authentication and must not be exposed through a public reverse proxy.
 
@@ -70,7 +70,7 @@ On Linux/macOS, build with `go build -o bin/godseye ./cmd/godseye` and run `./bi
 - Source locations, fingerprints independent of line numbers, redacted evidence, and explicit incomplete-scan status.
 - Canonical Protobuf JSON findings inside a scan envelope and SARIF 2.1.0 reports.
 - Offline operation, root-confined file opens, symlink exclusion, and report files created without overwriting existing files.
-- A separate keyless World view with public-source geographic records, browser-local annotations and attributed source-code reuse.
+- A keyless Earth console with public-source geographic records, NASA natural events, saved views, browser-local pins and attributed source-code reuse.
 - A security workbench with 14 report import formats, scoped TCP/DNS diagnostics, classic Ethernet PCAP metadata, file recovery candidates, static AWS IAM review, durable normalized evidence and per-report relationship graphs.
 - Eighteen browser-local recipe operations using two attributed CyberChef helpers, plus nine Sherlock URL templates for manual profile review. These are explicit subsets, not full replacements for those products.
 
@@ -107,7 +107,7 @@ The race detector requires a supported C compiler on Windows. Protobuf bindings 
 - [Verification results and first scan benchmark](docs/verification.md)
 - [Asset coverage, native capability plan and operating systems](docs/platform-scope.md)
 - [God's Eye View repository review](docs/reference-review.md)
-- [World view functionality, sources and attribution](docs/world-view.md)
+- [Earth console sources and operating limits](docs/earth-edition.md)
 - [Security workbench, 26-tool coverage and source reuse](docs/tool-workbench.md)
 
 The architecture separates live proxy/VPN traffic from audit workers. It does not promise universal anonymity or claim measured network performance.
