@@ -1,5 +1,13 @@
 # God's Eye
 
+Start the complete containerized application from this directory:
+
+```powershell
+docker compose up --build
+```
+
+Open the [security dashboard](http://127.0.0.1:8765) and [Earth console](http://127.0.0.1:4173). Both frontends build inside Docker. The [Python candidate](http://127.0.0.1:8875) starts separately while the remaining backend migration continues. See [Docker setup and local frontend development](documentation/10-docker-compose.md).
+
 The [Python backend migration](documentation/08-implementation-ledger.md) has started. Its isolated candidate supports inventory, source scans with JSON/SARIF exports, and HTTPS response checks. Run `./scripts/start-python.ps1 -Build -Port 8876` with PowerShell 7.4 or newer on Windows. The remaining backend features and default launcher still use Go until their parity gates pass. See [Python setup](backend/README.md).
 
 Version 0.4 adds [26 native assessment modules](docs/assessment-modules.md) to Workbench, including scoped web crawling, exposure rules, API contract review, cloud-template analysis, directory paths and extended capture analysis. Nmap has an optional installed-engine adapter. The module names identify related workflows; they do not mean all 26 external suites are installed or fully reproduced.
