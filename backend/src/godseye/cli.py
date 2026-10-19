@@ -79,6 +79,7 @@ def _parser() -> argparse.ArgumentParser:
     serve.add_argument("--web", "-web", type=Path, default=Path("apps/web/dist"))
     serve.add_argument("--state", "-state", type=Path, default=Path(".godseye"))
     serve.add_argument("--port", "-port", type=int, default=8765)
+    serve.add_argument("--bind", choices=["127.0.0.1", "0.0.0.0"], default="127.0.0.1")
     return parser
 
 
@@ -95,10 +96,12 @@ def run(args: Sequence[str], stdout: TextIO = sys.stdout, stderr: TextIO = sys.s
         import uvicorn
 
         try:
-            settings = Settings(options.root, options.state, options.web, options.port).validated()
+            settings = Settings(
+                options.root, options.state, options.web, options.port, options.bind
+            ).validated()
             uvicorn.run(
                 create_app(settings),
-                host="127.0.0.1",
+                host=settings.bind,
                 port=settings.port,
                 workers=1,
                 access_log=False,
