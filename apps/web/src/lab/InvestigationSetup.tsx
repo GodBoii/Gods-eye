@@ -83,11 +83,12 @@ export function InputEntry({
       <details className="investigation-help">
         <summary>What can the system investigate?</summary>
         <p>
-          Websites, domains, email domain configuration, local source
-          directories and file bytes have automated checks. Social handles and
-          profile URLs support manual link review. Names, phone numbers, street
-          addresses, company names, app names and other details are retained as
-          context with no automated lookup.
+          Emails support local analysis, domain checks and an optional
+          XposedOrNot breach lookup. Phone numbers need an international country
+          code and support local numbering-plan analysis. Names and usernames
+          have public research links. Websites, domains, local source
+          directories and files have automated checks. Addresses, companies,
+          apps and other details remain context only.
         </p>
         <p>
           For a remote code repository, provide a local checkout path inside the
@@ -289,6 +290,7 @@ export function ReviewPlan({
                 : item.operation.kind === "manual"
                   ? "Manual review"
                   : item.operation.kind === "file" ||
+                      item.operation.kind === "research" ||
                       (item.operation.kind === "check" &&
                         item.operation.checkKind === "source")
                     ? "Local analysis"
@@ -297,6 +299,15 @@ export function ReviewPlan({
           </article>
         ))}
       </div>
+      {plan.some(
+        (item) => item.selected && item.operation.kind === "breach",
+      ) && (
+        <p className="notice">
+          The selected breach check sends each selected email address to
+          XposedOrNot. Confirm that you have permission to share those addresses
+          with this provider. Only indexed breach names are returned.
+        </p>
+      )}
       <label className="checkbox investigation-consent">
         <input
           type="checkbox"
@@ -304,7 +315,7 @@ export function ReviewPlan({
           onChange={(event) => setAuthorized(event.target.checked)}
         />
         {needsPermission
-          ? "I own the selected targets or have permission to run these checks."
+          ? "I own the selected targets or have permission to run these checks and share identifiers with the listed providers."
           : "I have reviewed the selected analysis and manual review steps."}
       </label>
       <div className="investigation-actions">
