@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+import { validateIdentifier } from "./identifier-research";
+import type { ResearchKind } from "./identifier-research";
 export const inputKinds = [
   { id: "website", label: "Website / API URL" },
   { id: "domain", label: "Domain" },
@@ -26,6 +28,8 @@ export type InvestigationInput = {
   file: File | null;
 };
 export type Operation =
+  | { kind: "research"; researchKind: ResearchKind; target: string }
+  | { kind: "breach"; target: string }
   | { kind: "check"; target: string; checkKind: "source" | "website" }
   | { kind: "dns"; target: string }
   | { kind: "assessment"; target: string; tool: "nuclei" | "skipfish" }
@@ -66,7 +70,8 @@ export function suggestKind(value: string): InputKind {
       ? "profile"
       : "website";
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "email";
-  if (/^[+\d][\d\s().-]{6,24}$/.test(value)) return "phone";
+  if (/^[+\d][\d\s().-]{6,40}$/.test(value) && /[+\s().-]/.test(value))
+    return "phone";
   if (/^(?:[a-z]:[\\/]|\.\.?[\\/]|\/)/i.test(value) || value === ".")
     return "source";
   if (domainPattern.test(value)) return "domain";
@@ -96,6 +101,15 @@ export function validateInput(input: InvestigationInput): string | null {
   const value = input.value.trim();
   if (!value) return "Enter a value.";
   if (value.length > 4096) return "Use at most 4,096 characters per input.";
+  if (
+    input.kind === "email" ||
+    input.kind === "phone" ||
+    input.kind === "username" ||
+    input.kind === "person"
+  ) {
+    const error = validateIdentifier(input.kind, value);
+    if (error) return error;
+  }
   if (input.kind === "website" || input.kind === "profile") {
     const url = webURL(value);
     if (!url || url.username || url.password)
@@ -103,12 +117,6 @@ export function validateInput(input: InvestigationInput): string | null {
     if (input.kind === "website" && url.protocol !== "https:")
       return "Website checks require HTTPS. Use a full https:// URL.";
   }
-  if (
-    input.kind === "email" &&
-    (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ||
-      !domainPattern.test(value.slice(value.lastIndexOf("@") + 1)))
-  )
-    return "Enter an email address such as name@example.com.";
   if (input.kind === "domain" && !domainPattern.test(value))
     return "Enter a domain without a URL path, such as example.com.";
   if (
@@ -184,6 +192,21 @@ export function buildPlan(inputs: InvestigationInput[]): PlanItem[] {
           input.kind === "email"
             ? value.slice(value.lastIndexOf("@") + 1)
             : value;
+        if (input.kind === "email") {
+          add(
+            "research",
+            "Analyze email & prepare research",
+            "Local mailbox/domain parsing and manual public-source searches. No mailbox probing or identity inference.",
+            { kind: "research", researchKind: "email", target: value },
+          );
+          add(
+            "breach",
+            "Check indexed email breaches",
+            "Optional. Sends this email address to XposedOrNot over HTTPS. Returns indexed breach names, never passwords or leaked records. No key required; provider rate limits apply. Saved reports omit the email.",
+            { kind: "breach", target: value },
+            false,
+          );
+        }
         add(
           "dns",
           input.kind === "email"
@@ -245,11 +268,22 @@ export function buildPlan(inputs: InvestigationInput[]): PlanItem[] {
       }
       case "phone":
       case "person":
+      case "username":
+        add(
+          "research",
+          input.kind === "phone"
+            ? "Analyze phone number & prepare research"
+            : input.kind === "person"
+              ? "Prepare person-name research"
+              : "Explore public username / ID",
+          "Local analysis and public-source review links. Search terms are sent to the linked service only when you open a link. No ownership or identity claims.",
+          { kind: "research", researchKind: input.kind, target: value },
+        );
+        break;
       case "address":
       case "company":
       case "app":
       case "details":
-      case "username":
         add(
           "context",
           "Keep as investigation context",
