@@ -8,17 +8,14 @@
     "start": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
-    "test": "tsx --test src/world/*.test.ts src/lab/*.test.ts"
+    "test": "tsx --test src/lab/*.test.ts"
   },
   "dependencies": {
-    "d3-geo": "3.1.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "satellite.js": "6.0.2",
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@types/d3-geo": "3.1.1",
     "@types/node": "22.15.30",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
