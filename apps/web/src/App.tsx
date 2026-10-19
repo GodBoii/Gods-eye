@@ -1,45 +1,36 @@
 // SPDX-License-Identifier: Apache-2.0
 import { lazy, Suspense, useEffect, useState } from "react";
-import type { FormEvent } from "react";
 import { Assets } from "./Assets";
 import { Checks } from "./Checks";
 import { EarthConsole } from "./EarthConsole";
-import "./theme.css";
-import {
-  categories,
-  categoryLabel,
-  message,
-  request,
-  startCheck,
-  stateSchema,
-} from "./api";
+import { message, request, stateSchema } from "./api";
 import type { Asset, State } from "./api";
+import Investigation from "./lab/Investigation";
+import { SavedResults } from "./lab/SavedResults";
+import "./theme.css";
+import "./investigation.css";
 
 const Workbench = lazy(() => import("./lab/Workbench"));
 const ToolLibrary = lazy(() =>
   import("./lab/Workbench").then((module) => ({ default: module.ToolLibrary })),
 );
-type Page =
-  | "Workbench"
-  | "Overview"
-  | "Assets"
-  | "Checks"
-  | "Tools"
-  | "Earth console";
+type Page = "Investigate" | "Saved results" | "Advanced" | "Earth console";
 type Load =
   | { kind: "loading" }
   | { kind: "ready"; data: State }
   | { kind: "failed"; error: string };
 
 export default function App() {
-  const [page, setPage] = useState<Page>("Workbench");
+  const [page, setPage] = useState<Page>("Investigate");
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [revision, setRevision] = useState(0);
-  const [kind, setKind] = useState("source");
-  const [target, setTarget] = useState(".");
-  const [authorized, setAuthorized] = useState(false);
+  const [advanced, setAdvanced] = useState("Specialist tools");
+  const [historyView, setHistoryView] = useState("Analysis reports");
   const [selected, setSelected] = useState<string | null>(null);
-  const [action, setAction] = useState<"idle" | "busy">("idle");
+  const [seed, setSeed] = useState<{ target: string; kind: string } | null>(
+    null,
+  );
+  const [investigating, setInvestigating] = useState(false);
   const [error, setError] = useState("");
   const refresh = () => setRevision((value) => value + 1);
   useEffect(() => {
@@ -64,16 +55,26 @@ export default function App() {
           )
         )
           delay = 1000;
-        if (!controller.signal.aborted) setLoad({ kind: "ready", data });
+        if (!controller.signal.aborted) {
+          setLoad({ kind: "ready", data });
+          setError("");
+        }
       } catch (error) {
-        if (!controller.signal.aborted)
-          setLoad({ kind: "failed", error: message(error) });
+        if (!controller.signal.aborted) {
+          const detail = message(error);
+          setLoad((previous) =>
+            previous.kind === "ready"
+              ? previous
+              : { kind: "failed", error: detail },
+          );
+          setError(detail);
+        }
       }
       if (!controller.signal.aborted)
         timer = setTimeout(() => void poll(), delay);
     }
     const visible = () => {
-      if (!document.hidden) setRevision((value) => value + 1);
+      if (!document.hidden) refresh();
     };
     document.addEventListener("visibilitychange", visible);
     void poll();
@@ -83,80 +84,49 @@ export default function App() {
       document.removeEventListener("visibilitychange", visible);
     };
   }, [revision]);
-
-  async function start(event: FormEvent) {
-    event.preventDefault();
-    if (!authorized) return;
-    setAction("busy");
-    setError("");
-    try {
-      const id = await startCheck(target, kind);
-      setSelected(id);
-      setPage("Checks");
-      refresh();
-    } catch (error) {
-      setError(message(error));
-    } finally {
-      setAction("idle");
-    }
-  }
   async function cancel(id: string) {
     try {
-      await request(`/api/runs/${id}/cancel`, { method: "POST" });
+      await request(`/api/runs/${encodeURIComponent(id)}/cancel`, {
+        method: "POST",
+      });
       refresh();
     } catch (error) {
       setError(message(error));
     }
   }
   function inspect(asset: Asset) {
-    setKind(asset.kind);
-    setTarget(asset.target);
-    setAuthorized(false);
-    setPage("Overview");
+    if (investigating) {
+      setError(
+        "An investigation is running. Stop it or wait for it to finish before inspecting another asset.",
+      );
+      return;
+    }
+    setSeed({ target: asset.target, kind: asset.kind });
+    setPage("Investigate");
   }
   const data = load.kind === "ready" ? load.data : null;
-  const running =
-    data?.runs.some(
-      (run) => run.status === "running" || run.status === "cancelling",
-    ) ?? false;
-  const latest = data?.runs[0];
   return (
-    <div
-      className={`app-shell${page === "Earth console" ? "" : " security-skin"}`}
-    >
+    <div className="app-shell security-skin guided-shell">
       <a href="#main" className="skip-link">
         Skip to workspace
       </a>
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(event) => {
-            event.preventDefault();
-            setPage("Overview");
-          }}
+      <header className="workspace-header">
+        <button
+          className="workspace-brand"
+          onClick={() => setPage("Investigate")}
         >
-          <span className="brand-symbol">◉</span>
-          <span>
-            GOD'S EYE<small>SECURITY WORKSPACE</small>
-          </span>
-        </a>
-        <div className="workspace-tag">
-          <span className="status-dot" /> Local workspace{" "}
-          <span className="muted">01</span>
-        </div>
-        <span className="nav-heading">WORKSPACE</span>
+          <span aria-hidden="true">◉</span> GOD’S EYE{" "}
+          <small>Local investigation workspace</small>
+        </button>
         <nav aria-label="Main navigation">
           {(
             [
-              "Workbench",
-              "Overview",
-              "Assets",
-              "Checks",
-              "Tools",
+              "Investigate",
+              "Saved results",
+              "Advanced",
               "Earth console",
             ] satisfies Page[]
-          ).map((item, index) => (
+          ).map((item) => (
             <button
               key={item}
               aria-current={page === item ? "page" : undefined}
@@ -166,337 +136,154 @@ export default function App() {
                 setError("");
               }}
             >
-              <span className="nav-number">0{index + 1}</span>
               {item}
-              {item === "Assets" && (
-                <span className="nav-count">{data?.assets.length ?? 0}</span>
-              )}
-              {item === "Checks" && running && (
-                <span className="activity-dot" />
+              {item === "Investigate" && investigating && (
+                <span className="activity-dot" aria-label="Running" />
               )}
             </button>
           ))}
         </nav>
-        <div className="sidebar-note">
-          <span className="eyebrow">CONTROL BOUNDARY</span>
-          <p>
-            Your systems.
-            <br />
-            Your evidence.
-          </p>
-          <small>
-            Native diagnostics, offline analysis and imported evidence.
-          </small>
-        </div>
-        <div className="sidebar-bottom">
+        <span className="connection-state">
           <span className="status-dot" />
-          <span>
-            Local server <small>v0.4 · open source</small>
-          </span>
-        </div>
-      </aside>
-      <div className="main-shell">
-        <header className="topbar">
-          <span>
-            Workspace <span className="slash">/</span> <strong>{page}</strong>
-          </span>
-          <span className="local-chip">● &nbsp; LOOPBACK ONLY</span>
-        </header>
-        <main id="main">
-          <div className="page-heading">
-            <div>
-              <span className="eyebrow">OBSERVE / VERIFY / REVIEW</span>
-              <h1>
-                {page === "Workbench"
-                  ? "Security workbench."
-                  : page === "Overview"
-                    ? "Workspace overview."
-                    : page === "Assets"
-                      ? "Asset inventory."
-                      : page === "Checks"
-                        ? "Check evidence."
-                        : page === "Earth console"
-                            ? "Beyond the workspace."
-                            : "Tool coverage."}
-              </h1>
-              <p>
-                {page === "Workbench"
-                  ? "Import assessments. Inspect files. Trace relationships. Work locally."
-                  : page === "Overview"
-                    ? "A clear view of your systems, checks and security evidence."
-                    : page === "Assets"
-                      ? "Sites, APIs, source code and the infrastructure behind them."
-                      : page === "Checks"
-                        ? "Real check results, with coverage and limitations kept visible."
-                        : page === "Earth console"
-                            ? "The full geospatial application, rebuilt for public sources."
-                            : "What each integration provides, its source, license and limits."}
-              </p>
-            </div>
-            <span className="build-label">
-              LOCAL EDITION
-              <br />
-              <strong>0.4 / ACTIVE BUILD</strong>
-            </span>
+          {load.kind === "loading"
+            ? "Connecting"
+            : load.kind === "failed" || error
+              ? "Connection / action issue"
+              : "Local server connected"}
+        </span>
+      </header>
+      <main id="main">
+        {error && load.kind === "ready" && (
+          <p className="error" role="alert">
+            {error}
+            <button onClick={refresh}>Reconnect</button>
+          </p>
+        )}
+        {load.kind === "loading" && (
+          <div className="panel empty" role="status">
+            Connecting to your local workspace…
           </div>
-          {error && (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          )}
-          {load.kind === "loading" && (
-            <div className="panel empty" role="status">
-              Connecting to your workspace…
+        )}
+        {load.kind === "failed" && (
+          <div className="panel empty" role="alert">
+            <h1>Workspace unavailable</h1>
+            <p>{load.error}</p>
+            <button onClick={refresh}>Retry connection</button>
+          </div>
+        )}
+        {data && (
+          <>
+            <div hidden={page !== "Investigate"}>
+              <Investigation
+                workspace={data.workspace}
+                seed={seed}
+              onActivity={(busy) => {
+                setInvestigating(busy);
+                if (!busy) refresh();
+              }}
+              />
             </div>
-          )}
-          {load.kind === "failed" && (
-            <div className="panel empty" role="alert">
-              <h2>Workspace unavailable</h2>
-              <p>{load.error}</p>
-              <button onClick={refresh}>Retry connection</button>
-            </div>
-          )}
-          {data && (
-            <>
-              {page === "Workbench" && (
-                <Suspense
-                  fallback={
-                    <div className="panel empty" role="status">
-                      Loading workbench…
-                    </div>
-                  }
-                >
-                  <Workbench />
-                </Suspense>
-              )}
-              {page === "Earth console" && <EarthConsole />}
-              {page === "Overview" && (
-                <>
-                  <section className="metrics" aria-label="Workspace summary">
-                    <div>
-                      <span>Registered assets</span>
-                      <strong>
-                        {data.assets.length.toString().padStart(2, "0")}
-                      </strong>
-                      <small>Owned scope · not coverage</small>
-                    </div>
-                    <div>
-                      <span>Session checks</span>
-                      <strong>
-                        {data.runs.length.toString().padStart(2, "0")}
-                      </strong>
-                      <small>
-                        {running
-                          ? "A check is running"
-                          : "Ready for your next check"}
-                      </small>
-                    </div>
-                    <div>
-                      <span>
-                        {latest && latest.kind !== "source"
-                          ? "Latest review items"
-                          : "Latest candidates"}
-                      </span>
-                      <strong>
-                        {latest
-                          ? (latest.kind === "source"
-                              ? latest.findingCount
-                              : latest.reviewCount
-                            )
-                              .toString()
-                              .padStart(2, "0")
-                          : "—"}
-                      </strong>
-                      <small>
-                        {latest
-                          ? "Candidates require verification"
-                          : "No checks completed yet"}
-                      </small>
-                    </div>
-                    <div>
-                      <span>Native capabilities</span>
-                      <strong>09</strong>
-                      <small>Scans, diagnostics and offline analysis</small>
-                    </div>
-                  </section>
-                  <div className="overview-grid">
-                    <section className="panel scan-panel">
-                      <div className="panel-title">
-                        <h2>Start a check</h2>
-                        <span className="eyebrow">01 / inspect</span>
-                      </div>
-                      <form onSubmit={start} className="form-stack">
-                        <label>
-                          Target type
-                          <select
-                            value={kind}
-                            onChange={(event) => {
-                              setKind(event.target.value);
-                              setTarget(
-                                event.target.value === "source" ? "." : "",
-                              );
-                              setAuthorized(false);
-                            }}
-                          >
-                            {categories
-                              .filter((item) => item.available)
-                              .map((item) => (
-                                <option key={item.id} value={item.id}>
-                                  {item.label}
-                                </option>
-                              ))}
-                          </select>
-                        </label>
-                        <label>
-                          {kind === "source"
-                            ? "Directory inside workspace"
-                            : "Public HTTPS endpoint"}
-                          <input
-                            required
-                            value={target}
-                            onChange={(event) => {
-                              setTarget(event.target.value);
-                              setAuthorized(false);
-                            }}
-                            placeholder={
-                              kind === "source"
-                                ? "services/backend"
-                                : "https://your-domain.com"
-                            }
-                            maxLength={1024}
-                          />
-                        </label>
-                        <div className="scope-note">
-                          <span>
-                            {kind === "source"
-                              ? "WORKSPACE ROOT"
-                              : "CHECK COVERAGE"}
-                          </span>
-                          <code>
-                            {kind === "source"
-                              ? data.workspace
-                              : "One HEAD request · TLS · response headers"}
-                          </code>
-                        </div>
-                        <label className="checkbox">
-                          <input
-                            type="checkbox"
-                            checked={authorized}
-                            onChange={(event) =>
-                              setAuthorized(event.target.checked)
-                            }
-                          />
-                          I own this target or have permission to assess it.
-                        </label>
-                        <button
-                          className="primary"
-                          disabled={!authorized || action === "busy" || running}
-                        >
-                          {running
-                            ? "A check is already running"
-                            : action === "busy"
-                              ? "Starting…"
-                              : "Run check ↗"}
-                        </button>
-                        <p className="muted small">
-                          {kind === "source"
-                            ? "Credential values stay out of reports. Source files are not modified."
-                            : "No redirects, crawling or attack payloads. Private addresses are not supported in this version."}
-                        </p>
-                      </form>
-                    </section>
-                    <section className="panel activity">
-                      <div className="panel-title">
-                        <h2>Recent activity</h2>
-                        <span className="eyebrow">02 / evidence</span>
-                      </div>
-                      {data.runs.length === 0 ? (
-                        <div className="empty">
-                          <div className="scope-orbit">
-                            <span>◎</span>
-                          </div>
-                          <h3>Ready when you are.</h3>
-                          <p>
-                            Start with a local source check.
-                            <br />
-                            Your first results will appear here.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="activity-list">
-                          {data.runs.slice(0, 5).map((run) => (
-                            <button
-                              key={run.id}
-                              onClick={() => {
-                                setSelected(run.id);
-                                setPage("Checks");
-                              }}
-                            >
-                              <span className={`badge ${run.status}`}>
-                                {run.status}
-                              </span>
-                              <strong>{run.target}</strong>
-                              <small>
-                                {categoryLabel(run.kind)} ·{" "}
-                                {new Date(run.startedAt).toLocaleTimeString()}
-                              </small>
-                              <span className="activity-arrow">↗</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      <div className="panel-footer">
-                        Checks remain available during this server session.
-                      </div>
-                    </section>
+            {page === "Saved results" && (
+              <>
+                <div className="page-heading">
+                  <div>
+                    <h1>Saved results</h1>
+                    <p>
+                      Reopen evidence, review coverage and export what matters.
+                    </p>
                   </div>
-                  <section className="scope-strip">
-                    <div>
-                      <span className="eyebrow">
-                        NEXT / BUILD YOUR INVENTORY
-                      </span>
-                      <h2>One workspace. Every layer of your stack.</h2>
-                      <p>
-                        Register deployed services alongside source
-                        repositories. Keep untested assets visible.
-                      </p>
-                    </div>
-                    <button onClick={() => setPage("Assets")}>
-                      Manage assets →
-                    </button>
-                  </section>
-                </>
-              )}
-              {page === "Assets" && (
-                <Assets
-                  assets={data.assets}
-                  refresh={refresh}
-                  inspect={inspect}
-                />
-              )}
-              {page === "Checks" && (
-                <Checks
-                  runs={data.runs}
-                  selected={selected}
-                  select={setSelected}
-                  cancel={(id) => void cancel(id)}
-                />
-              )}
-              {page === "Tools" && (
-                <Suspense
-                  fallback={<p role="status">Loading tool coverage…</p>}
+                </div>
+                <div
+                  className="workspace-subnav"
+                  aria-label="Result categories"
                 >
-                  <ToolLibrary />
-                </Suspense>
-              )}
-            </>
-          )}
-          <footer className="main-footer">
-            <span>GOD'S EYE / LOCAL SECURITY WORKSPACE</span>
-            <span>Evidence over assumptions.</span>
-          </footer>
-        </main>
-      </div>
+                  {["Analysis reports", "Source & HTTPS checks"].map((item) => (
+                    <button
+                      key={item}
+                      aria-pressed={historyView === item}
+                      onClick={() => setHistoryView(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                {historyView === "Analysis reports" ? (
+                  <SavedResults />
+                ) : (
+                  <Checks
+                    runs={data.runs}
+                    selected={selected}
+                    select={setSelected}
+                    cancel={(id) => void cancel(id)}
+                  />
+                )}
+              </>
+            )}
+            {page === "Advanced" && (
+              <>
+                <div className="page-heading">
+                  <div>
+                    <h1>Advanced workspace</h1>
+                    <p>
+                      Use individual modules, import existing evidence or manage
+                      your inventory.
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="workspace-subnav"
+                  aria-label="Advanced categories"
+                >
+                  {["Specialist tools", "Asset inventory", "Tool coverage"].map(
+                    (item) => (
+                      <button
+                        key={item}
+                        aria-pressed={advanced === item}
+                        onClick={() => setAdvanced(item)}
+                      >
+                        {item}
+                      </button>
+                    ),
+                  )}
+                </div>
+                {advanced === "Asset inventory" ? (
+                  <Assets
+                    assets={data.assets}
+                    refresh={refresh}
+                    inspect={inspect}
+                  />
+                ) : (
+                  <Suspense fallback={<p role="status">Loading tools…</p>}>
+                    {advanced === "Specialist tools" ? (
+                      <Workbench />
+                    ) : (
+                      <ToolLibrary />
+                    )}
+                  </Suspense>
+                )}
+              </>
+            )}
+            {page === "Earth console" && (
+              <>
+                <div className="page-heading">
+                  <div>
+                    <h1>Earth console</h1>
+                    <p>
+                      Explore public geographic sources in the separate Earth
+                      workspace.
+                    </p>
+                  </div>
+                </div>
+                <EarthConsole />
+              </>
+            )}
+          </>
+        )}
+        <footer className="workspace-footer">
+          <span>GOD’S EYE · LOCAL WORKSPACE</span>
+          <span>Results include their scope and limitations.</span>
+        </footer>
+      </main>
     </div>
   );
 }
