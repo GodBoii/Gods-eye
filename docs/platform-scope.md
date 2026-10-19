@@ -1,5 +1,7 @@
 # Platform scope and native capability plan
 
+World view has been retired. Geographic feeds, including its NASA EONET natural events, now run in [Earth console](earth-edition.md).
+
 Version 0.4 adds the [assessment modules](assessment-modules.md), including bounded web crawling, native exposure rules, API evidence contracts, capture formats and configuration/graph analysis. The original 0.3 endpoint-only and no-engine descriptions below remain historical baseline scope. Full authenticated frontend/backend/database auditing is still not implemented.
 
 The platform organizes source repositories, deployed websites, APIs, backend services, applications, databases, cloud resources, containers and networks. An inventory entry records scope; it is not evidence that an asset has been assessed. Access to private data or authenticated services requires explicit credentials and authorization in a future connector. No system can collect or assess all internet data.
