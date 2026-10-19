@@ -57,8 +57,24 @@ The gateway translates only each site's exact HTTPS Origin to its expected
 internal HTTP Origin. Unknown origins and hosts are rejected. Backend
 cross-site and custom-request-header checks remain active.
 
-The dashboard's existing Earth link points to local port 4173. For this
-deployment, open `https://earth.polycognition.online` directly.
+On `godseye.polycognition.online`, the dashboard's Earth link opens
+`https://earth.polycognition.online`. Local dashboard instances retain the
+local port 4173 link.
+
+## Deployment verification on 19 October 2026
+
+All three application containers became healthy on Ubuntu, with the gateway
+running on loopback port 18080. Docker starts at boot, and all four services use
+`restart: unless-stopped`. Live gateway checks passed for dashboard health,
+HTTPS-origin reads and inventory creation/deletion, Earth HTML, and rejection
+of unknown hosts, origins, cross-site requests and writes without the custom
+request header. The temporary inventory item was removed.
+
+Cloudflare's `God's Eye` self-hosted Access application covers both domains and
+uses the existing `Allow me` email policy. Both published application routes
+were added to `ubuntu-ssh`, with DNS records created automatically. Anonymous
+HTTPS requests to both domains returned 302 to Cloudflare Access. A complete
+signed-in browser check still requires the owner's authentication.
 
 ## Local verification before publishing
 
