@@ -1,5 +1,7 @@
 # Python migration candidate
 
+The root `docker compose up --build` now starts this candidate on port 8875, the complete existing dashboard/backend on 8765, and Earth on 4173. Frontend assets build in Docker. See [the Compose guide](../documentation/10-docker-compose.md). This packages the current migration state; it does not mark unported features complete.
+
 The current implementation runs inventory, source scans and single-response HTTPS checks, with JSON/SARIF exports, request guards, persistent inventory, one active check, cancellation and a spawned scan worker. It does not call Go. Python 3.13 is required. The exact tested patch is 3.13.3 on Windows. The preview launcher requires PowerShell 7.4 or newer.
 
 This is an intermediate implementation. World feeds, evidence stores, imports, diagnostics and the 26 assessments still run in the existing Go release. They are not advertised by the Python candidate. Do not use the candidate as the default backend until the remaining acceptance gates pass. See [the implementation ledger](../documentation/08-implementation-ledger.md).
