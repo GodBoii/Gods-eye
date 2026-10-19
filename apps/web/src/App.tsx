@@ -9,6 +9,7 @@ import Investigation from "./lab/Investigation";
 import { SavedResults } from "./lab/SavedResults";
 import "./theme.css";
 import "./investigation.css";
+import "./branding.css";
 
 const Workbench = lazy(() => import("./lab/Workbench"));
 const ToolLibrary = lazy(() =>
@@ -115,7 +116,7 @@ export default function App() {
           className="workspace-brand"
           onClick={() => setPage("Investigate")}
         >
-          <span aria-hidden="true">◉</span> GOD’S EYE{" "}
+          <img className="workspace-logo" src="/icons/icon-192.png" width="40" height="40" alt="" /> GOD’S EYE{" "}
           <small>Local investigation workspace</small>
         </button>
         <nav aria-label="Main navigation">
