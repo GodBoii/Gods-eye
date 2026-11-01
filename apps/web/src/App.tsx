@@ -12,10 +12,16 @@ import "./investigation.css";
 import "./branding.css";
 
 const Workbench = lazy(() => import("./lab/Workbench"));
+const Intelligence = lazy(() => import("./lab/Intelligence"));
 const ToolLibrary = lazy(() =>
   import("./lab/Workbench").then((module) => ({ default: module.ToolLibrary })),
 );
-type Page = "Investigate" | "Saved results" | "Advanced" | "Earth console";
+type Page =
+  | "Investigate"
+  | "Intelligence"
+  | "Saved results"
+  | "Advanced"
+  | "Earth console";
 type Load =
   | { kind: "loading" }
   | { kind: "ready"; data: State }
@@ -123,6 +129,7 @@ export default function App() {
           {(
             [
               "Investigate",
+              "Intelligence",
               "Saved results",
               "Advanced",
               "Earth console",
@@ -219,6 +226,11 @@ export default function App() {
                   />
                 )}
               </>
+            )}
+            {page === "Intelligence" && (
+              <Suspense fallback={<p role="status">Loading intelligence…</p>}>
+                <Intelligence investigate={() => setPage("Investigate")} />
+              </Suspense>
             )}
             {page === "Advanced" && (
               <>
