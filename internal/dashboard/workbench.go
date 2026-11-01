@@ -34,6 +34,12 @@ func (s *Server) registerWorkbench(mux *http.ServeMux) {
 		send(w, 200, map[string]any{"tools": workbench.Catalog(), "formats": workbench.Formats(), "maxInputBytes": workbench.MaxInput})
 	})
 	mux.HandleFunc("GET /api/lab/reports", func(w http.ResponseWriter, r *http.Request) { send(w, 200, s.evidence.List()) })
+	mux.HandleFunc("GET /api/lab/intelligence", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("download") == "1" {
+			w.Header().Set("Content-Disposition", "attachment; filename=godseye-intelligence.json")
+		}
+		send(w, 200, s.evidence.Intelligence(time.Now()))
+	})
 	mux.HandleFunc("GET /api/lab/reports/{id}", func(w http.ResponseWriter, r *http.Request) {
 		report := s.evidence.Get(r.PathValue("id"))
 		if report == nil {
