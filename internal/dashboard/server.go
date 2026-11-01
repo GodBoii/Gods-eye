@@ -343,6 +343,12 @@ func (s *Server) execute(ctx context.Context, run *Run, target string) {
 	run.Error = completed.Error
 	run.jsonReport = completed.jsonReport
 	run.sarifReport = completed.sarifReport
+	if err := s.evidence.Save(runEvidence(run)); err != nil {
+		run.Gaps = append(run.Gaps, "Normalized evidence could not be saved. Export this session check before restarting the server.")
+		if run.Status == "completed" {
+			run.Status = "partial"
+		}
+	}
 }
 func (s *Server) cancelRun(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
