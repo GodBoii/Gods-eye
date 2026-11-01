@@ -33,14 +33,16 @@ func auditNuclei(ctx context.Context, req ToolRequest) (*Report, error) {
 	}
 	r := newReport("nuclei", "Native HTTP exposure rules executed against one explicitly requested URL.", response.Body)
 	r.observe("HTTP status", response.URL, fmt.Sprint(response.Status))
-	r.observe("rule set", response.URL, "directory listing; embedded-source v3 source map; debug traceback; cookie transport attributes")
+	r.observe("rule set", response.URL, "directory listing; embedded-source v3 source map; debug traceback; cookie transport attributes; sensitive environment and Git configuration; GitHub token patterns; parseable PEM private keys; CORS configuration")
 	nucleiExposureRules(r, response)
 	nucleiCookieRules(r, response)
+	nucleiSensitiveRules(r, response)
+	nucleiCORSRules(r, response)
 	if response.Truncated {
 		r.Limited = true
 		r.gap("Response body exceeded the fetch limit; body rules examined only the retained prefix.")
 	}
-	r.gap("Only four native rule families run on one response. No Nuclei engine, templates, crawling, authenticated flows, exploit execution or backend/database audit. A clean result does not establish security.")
+	r.gap("Only the listed native rules run on one response. Sensitive-content rules skip declared HTML; encrypted/OpenSSH keys and other credential formats are not covered. No Nuclei engine, templates, path discovery, crawling, authenticated flows, exploit execution or backend/database audit. A clean result does not establish security.")
 	r.Summary = fmt.Sprintf("Native HTTP rules completed: %d configuration or exposure findings at one URL.", len(r.Findings))
 	return r, nil
 }
