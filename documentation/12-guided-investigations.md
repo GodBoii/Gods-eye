@@ -43,7 +43,7 @@ Results distinguish Completed, Limited, Failed, Needs manual review, No automate
 
 The full investigation remains in memory while navigating between dashboard sections. Reloading the tab or starting another investigation discards that grouping. Export investigation downloads JSON containing input values, confirmed types, coverage and every step's outcome. Raw attached files are excluded from the export.
 
-Individual normalized lab reports use the existing persistent store, which retains the newest 20 reports. Source/HTTPS check history uses the existing session-only store, which also retains 20 checks. Saved results separates these stores. Grouping does not survive a reload and cannot be reconstructed from the separate reports alone.
+Individual normalized lab reports use the persistent store, which retains the newest 20 reports. Finished source/HTTPS checks now save normalized findings, observations and coverage into that same retention window. Original check records and original JSON/SARIF exports remain in the session-only store, which retains 20 checks. Saved results separates normalized reports from original session checks. Investigation grouping does not survive a reload; Intelligence connects retained reports by their recorded targets and exact hosts without reconstructing personal context or asserting identity. See [connected intelligence](13-connected-intelligence.md).
 
 Stop investigation aborts the active client request and prevents remaining steps from starting. For a source/HTTPS check with a known run ID, the client also requests server cancellation. A server operation may have completed before the abort; check Saved results before retrying. Each automated step has a client timeout as well as the backend's existing limits.
 
