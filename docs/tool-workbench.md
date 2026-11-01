@@ -74,7 +74,7 @@ Malformed or incompatible input fails without saving a report. Each upload is li
 
 ## Storage, privacy and access
 
-Normalized reports persist as owner-created JSON files in `<state>/evidence/`. Writes use a temporary file, sync and rename. The newest 20 reports are retained; older reports are pruned. Export important results before importing enough reports to trigger retention. Source/HTTPS check history still uses the existing session-only run list.
+Normalized reports persist as owner-created JSON files in `<state>/evidence/`. Writes use a temporary file, sync and rename. The newest 20 reports are retained; older reports are pruned. Finished source/HTTPS checks also save normalized evidence in this shared window; original run records and original exports remain session-only. Export important results before new reports trigger retention. The [Intelligence view](../documentation/13-connected-intelligence.md) connects retained findings, exact hosts and infrastructure relationships with source provenance.
 
 Raw upload bytes are not saved. Recovery downloads slice the original File in the browser tab; reopening an old report does not recreate file contents. Titles, paths, IPs, directory identifiers and resource names are retained. Normalization is not a universal secret scrubber. URL userinfo, query strings and fragments are removed from normalized targets, and HTTP bodies/cookies/authorization headers are not selected for import.
 
