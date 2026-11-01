@@ -1,0 +1,246 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.intelligence {
+  min-width: 0;
+}
+.intelligence-heading,
+.intelligence-actions,
+.intelligence-finding header,
+.intelligence-finding-meta,
+.intelligence-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.intelligence-heading {
+  justify-content: space-between;
+}
+.intelligence-totals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-block: 1px solid var(--line);
+  margin: 24px 0 12px;
+}
+.intelligence-totals > div {
+  padding: 20px 16px;
+  border-inline-start: 1px solid var(--line);
+}
+.intelligence-totals > div:first-child {
+  border-inline-start: 0;
+}
+.intelligence-totals dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.intelligence-totals dd {
+  margin: 8px 0 0;
+  font-size: 30px;
+  line-height: 1.1;
+}
+.intelligence-workspace {
+  display: grid;
+  grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+  border-block: 1px solid var(--line);
+  margin-top: 28px;
+}
+.intelligence-assets {
+  border-inline-end: 1px solid var(--line);
+  padding: 20px 20px 20px 0;
+  min-width: 0;
+}
+.intelligence-assets h2,
+.intelligence-triage h2,
+.intelligence-relationships h2 {
+  font-size: 17px;
+  margin: 0 0 20px;
+  overflow-wrap: anywhere;
+}
+.intelligence-assets label {
+  margin-bottom: 16px;
+}
+.intelligence-asset {
+  display: grid;
+  gap: 5px;
+  text-align: start;
+  width: 100%;
+  margin: 0 0 6px;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.intelligence-asset small,
+.intelligence-asset span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.guided-shell .intelligence-asset[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: #222a1e;
+}
+.intelligence-triage {
+  min-width: 0;
+  padding: 20px 0 24px 24px;
+}
+.intelligence-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+  gap: 16px;
+}
+.intelligence input,
+.intelligence select {
+  width: 100%;
+}
+.intelligence-finding {
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+  overflow-wrap: anywhere;
+}
+.intelligence-finding h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.intelligence-finding > code {
+  display: block;
+  margin: 12px 0;
+  color: #c5ccc8;
+  font-size: 12px;
+  white-space: normal;
+}
+.intelligence-finding p {
+  color: #c7ceca;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.intelligence-severity {
+  padding: 4px 7px;
+  border: 1px solid #565f5a;
+  border-radius: 3px;
+  font:
+    11px Consolas,
+    monospace;
+  text-transform: uppercase;
+  color: #c3cac7;
+}
+.intelligence-severity-critical,
+.intelligence-severity-high {
+  color: #ffb6a6;
+  border-color: #885042;
+  background: #30201d;
+}
+.intelligence-severity-medium {
+  color: #ebd2a0;
+  border-color: #786742;
+}
+.intelligence-finding-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.intelligence details summary {
+  cursor: pointer;
+  padding-block: 10px;
+  font-size: 13px;
+}
+.intelligence-provenance {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.intelligence-provenance li {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.intelligence-provenance code {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  font-size: 11px;
+}
+.intelligence-provenance button {
+  justify-self: start;
+}
+.intelligence-pagination {
+  justify-content: space-between;
+  font-size: 12px;
+}
+.intelligence-relationships {
+  padding-block: 28px;
+}
+.intelligence-relationships table {
+  min-width: 580px;
+}
+.intelligence-relationships td {
+  overflow-wrap: anywhere;
+  max-width: 340px;
+}
+.intelligence-relationships td button {
+  text-align: start;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  margin: 3px;
+}
+.intelligence-sources,
+.intelligence-coverage {
+  border-top: 1px solid var(--line);
+  padding-block: 12px;
+}
+.intelligence-sources ul {
+  list-style: none;
+  padding: 0;
+}
+.intelligence-sources li {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding-block: 10px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.intelligence-coverage li {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.intelligence-source-detail {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .intelligence-totals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .intelligence-totals > div:nth-child(3) {
+    border-inline-start: 0;
+  }
+  .intelligence-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .intelligence-assets {
+    padding: 20px 0;
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--line);
+    max-height: 350px;
+    overflow-y: auto;
+  }
+  .intelligence-triage {
+    padding-inline-start: 0;
+  }
+  .intelligence-filters,
+  .intelligence-sources li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .intelligence-totals > div {
+    padding-inline: 10px;
+  }
+  .intelligence-finding-meta {
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
+  }
+}
