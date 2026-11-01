@@ -166,7 +166,7 @@ export function buildPlan(inputs: InvestigationInput[]): PlanItem[] {
         add(
           "exposure",
           "Page exposure review",
-          "Native Nuclei-related rules for directory listings, tracebacks, source maps and cookies. Fetches this URL.",
+          "Checks this response for exposed configuration, credential patterns, private keys, CORS, directory listings, tracebacks, source maps and cookies. No path discovery.",
           { kind: "assessment", target: value, tool: "nuclei" },
         );
         add(
